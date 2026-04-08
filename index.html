@@ -13,25 +13,53 @@
 
         body {
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            /* 替换成你的背景图直链 */
-            background: url("https://raw.githubusercontent.com/reiilive/reiilive.github.io/main/beijing.png") no-repeat center center fixed;
-            background-size: cover; /* 自动适配所有屏幕 */
-            color: #433469; /* 全局字体颜色改成#433469 */
+            /* 重构背景图写法，解决兼容性+缓存问题 */
+            background-image: url("https://raw.githubusercontent.com/reiilive/reiilive.github.io/main/beijing.png?version=1.0");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            /* 背景图加载失败的兜底色，避免全白 */
+            background-color: #f8f5ff;
+            /* 强制背景图层级最高，避免被遮挡 */
+            background-blend-mode: normal;
+            color: #433469;
             min-height: 100vh;
             padding: 2rem 1rem;
+            /* 强制刷新样式，绕过浏览器缓存 */
+            position: relative;
+            z-index: 0;
+        }
+
+        /* 额外加伪元素兜底，双重保障背景显示 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://raw.githubusercontent.com/reiilive/reiilive.github.io/main/beijing.png?version=1.0");
+            background-position: center;
+            background-size: cover;
+            opacity: 1;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
             max-width: 700px;
             margin: 0 auto;
             text-align: center;
-            /* 超透背景！透明度调到0.3，几乎看不见底色 */
             background: rgba(255, 255, 255, 0.3);
             padding: 2rem;
             border-radius: 24px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(2px); /* 极轻微毛玻璃，不挡背景 */
-            border: 1px solid rgba(255, 255, 255, 0.5); /* 细白边勾勒轮廓 */
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            /* 保证内容在背景之上 */
+            position: relative;
+            z-index: 1;
         }
 
         .avatar {
@@ -39,30 +67,26 @@
             height: 160px;
             border-radius: 50%;
             object-fit: cover;
-            /* 头像外圈改成#d4d1f0，保留透明度 */
             border: 4px solid rgba(212, 209, 240, 0.8);
-            /* 加荧光发光效果，强化外圈视觉 */
             box-shadow: 0 0 15px rgba(212, 209, 240, 0.6), 0 8px 24px rgba(212, 209, 240, 0.15);
             margin-bottom: 1rem;
         }
 
         .name {
             font-size: 2.2rem;
-            color: #433469; /* 名字颜色改成#433469 */
+            color: #433469;
             margin-bottom: 0.5rem;
-            /* 文字阴影调淡，不抢背景风头 */
             text-shadow: 0 1px 2px rgba(255,255,255,0.6);
         }
 
         .tag {
             font-size: 1rem;
-            color: #433469; /* 标签颜色改成#433469 */
+            color: #433469;
             margin-bottom: 2rem;
             text-shadow: 0 1px 1px rgba(255,255,255,0.6);
         }
 
         .section {
-            /* 模块也超透，透明度0.4 */
             background: rgba(255, 255, 255, 0.4);
             border-radius: 20px;
             padding: 1.5rem;
@@ -74,7 +98,7 @@
 
         .section h2 {
             font-size: 1.2rem;
-            color: #433469; /* 模块标题颜色改成#433469 */
+            color: #433469;
             margin-bottom: 1rem;
             text-align: center;
             text-shadow: 0 1px 1px rgba(255,255,255,0.6);
@@ -84,8 +108,7 @@
             text-align: center;
             line-height: 1.8;
             font-size: 0.95rem;
-            color: #433469; /* 直播信息字体颜色改成#433469 */
-            /* 文字加极淡阴影，保证在花背景上能看清 */
+            color: #433469;
             text-shadow: 0 0.5px 1px rgba(255,255,255,0.5);
         }
 
@@ -100,9 +123,8 @@
         .btn {
             padding: 0.7rem 1.4rem;
             border-radius: 30px;
-            /* 按钮底色改成#d4d1f0，保留透明度 */
             background: rgba(212, 209, 240, 0.7);
-            color: #433469; /* 按钮文字颜色改成#433469 */
+            color: #433469;
             text-decoration: none;
             font-weight: bold;
             transition: all 0.2s;
@@ -111,7 +133,6 @@
         }
 
         .btn:hover {
-            /* 鼠标悬浮时按钮加深，保持风格统一 */
             background: #433469;
             color: #d4d1f0;
             transform: translateY(-2px);
@@ -122,22 +143,21 @@
         .footer {
             margin-top: 3rem;
             font-size: 0.8rem;
-            color: #433469; /* 页脚字体颜色改成#433469 */
+            color: #433469;
             text-shadow: 0 0.5px 1px rgba(255,255,255,0.6);
         }
 
-        /* 移动端适配，保持超透风格 */
+        /* 移动端适配 */
         @media (max-width: 768px) {
             .container {
                 padding: 1.5rem 1rem;
                 margin: 0 0.5rem;
-                backdrop-filter: blur(1px); /* 手机上毛玻璃更淡 */
+                backdrop-filter: blur(1px);
                 background: rgba(255, 255, 255, 0.35);
             }
             .avatar {
                 width: 120px;
                 height: 120px;
-                /* 手机端头像外圈发光效果适配 */
                 box-shadow: 0 0 10px rgba(212, 209, 240, 0.6), 0 6px 18px rgba(212, 209, 240, 0.15);
             }
             .name {
@@ -152,17 +172,19 @@
 
 <body>
     <div class="container">
-        <!-- 你的头像直链 -->
         <img src="https://raw.githubusercontent.com/reiilive/reiilive.github.io/main/260409touxiang.png" alt="月岛怜" class="avatar">
         <h1 class="name">月岛怜</h1>
-        <div class="tag">🐱 海上红茶馆Mirage的打工猫 | 歌杂 | 偶尔打游戏</div>
+        <!-- 移除tag里的直播内容，只保留简介 -->
+        <div class="tag">海上红茶馆Mirage的打工猫，不是笨蛋> <</div>
 
         <div class="section">
             <h2>🎤 直播信息</h2>
             <div class="live-info">
                 直播平台：Bilibili<br>
-                直播时间：每晚20:00 午台随机掉落 周二定休<br>
-                内容：杂谈 / 唱歌 / 游戏
+                直播时间：每晚20:00<br>
+                午台随机掉落 周二定休<br>
+                <!-- 新增直播内容行，前面加“直播内容：” -->
+                直播内容：杂谈 | 唱歌 | 偶尔打游戏
             </div>
         </div>
 
