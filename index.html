@@ -3,154 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reii | 虚拟主播</title>
+    <title>Tsukishima Rei</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a103c 0%, #6441a5 50%, #ff79c6 100%);
-            color: white;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(to bottom, #fff0f8, #f8e8ff);
+            color: #333;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 2rem 1rem;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 700px;
             margin: 0 auto;
-            padding: 2rem;
+            text-align: center;
         }
 
         .avatar {
-            width: 180px;
-            height: 180px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            margin: 2rem auto;
-            display: block;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 30px #ff79c6;
             object-fit: cover;
-        }
-
-        .title {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 0 15px #ff79c6;
-        }
-
-        .subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 3rem;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .card h2 {
+            border: 4px solid #fff;
+            box-shadow: 0 8px 24px rgba(255, 150, 200, 0.2);
             margin-bottom: 1rem;
-            color: #ffb9de;
         }
 
-        .card p {
-            line-height: 1.7;
+        .name {
+            font-size: 2.2rem;
+            color: #e9529a;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag {
             font-size: 1rem;
+            color: #999;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            color: #e9529a;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .live-info {
+            text-align: center;
+            line-height: 1.8;
+            font-size: 0.95rem;
         }
 
         .links {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.8rem;
             justify-content: center;
-            margin: 2rem 0;
+            margin-top: 1rem;
         }
 
         .btn {
-            padding: 0.9rem 2rem;
-            background: rgba(255, 121, 198, 0.2);
-            border: 2px solid #ff79c6;
-            border-radius: 50px;
-            color: white;
+            padding: 0.7rem 1.4rem;
+            border-radius: 30px;
+            background: #f8d0e4;
+            color: #d64a8a;
             text-decoration: none;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .btn:hover {
-            background: #ff79c6;
-            transform: translateY(-3px);
-            box-shadow: 0 0 15px #ff79c6;
+            background: #e9529a;
+            color: white;
+            transform: translateY(-2px);
         }
 
-        .schedule {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .day {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 1rem;
-            opacity: 0.7;
+        .footer {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            color: #bbb;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <img src="https://picsum.photos/id/301/300/300" alt="Reii" class="avatar">
-        <h1 class="title">Reii</h1>
-        <p class="subtitle">虚拟主播 | 可爱系 | 杂谈 & 游戏</p>
+        <!-- 已替换成你的头像直链 -->
+        <img src="https://raw.githubusercontent.com/reiilive/reiilive.github.io/main/img_2017.png" alt="月岛怜" class="avatar">
+        <h1 class="name">月岛怜</h1>
+        <div class="tag">🐱 海上红茶馆Mirage的打工猫 | 歌杂 | 偶尔打游戏</div>
 
-        <div class="card">
-            <h2>🌟 关于我</h2>
-            <p>这里是 Reii，一名来自虚拟世界的可爱系主播～喜欢聊天、打游戏、唱歌，也喜欢和大家贴贴！感谢你来到我的小世界，今后请多多指教啦 ✨</p>
-        </div>
-
-        <div class="links">
-            <a class="btn" href="#">B站</a>
-            <a class="btn" href="#">抖音</a>
-            <a class="btn" href="#">YouTube</a>
-            <a class="btn" href="#">粉丝群</a>
-        </div>
-
-        <div class="card">
-            <h2>📅 直播日程</h2>
-            <div class="schedule">
-                <div class="day">周一 休息</div>
-                <div class="day">周二 20:00 游戏</div>
-                <div class="day">周三 20:00 杂谈</div>
-                <div class="day">周四 休息</div>
-                <div class="day">周五 21:00 歌回</div>
-                <div class="day">周六 20:00 随机</div>
-                <div class="day">周日 20:00 随机</div>
+        <div class="section">
+            <h2>🎤 直播信息</h2>
+            <div class="live-info">
+                直播平台：Bilibili<br>
+                直播时间：每晚20:00 午台随机掉落 周二定休<br>
+                内容：杂谈 / 唱歌 / 游戏
             </div>
         </div>
 
-        <div class="card">
-            <h2>🎵 作品展示</h2>
-            <p>翻唱 / 原创歌曲 / 模型展示 / 短视频</p>
+        <div class="section">
+            <h2>🔗 快速前往</h2>
+            <div class="links">
+                <a href="#" class="btn">B站主页</a>
+                <a href="#" class="btn">直播间</a>
+                <a href="#" class="btn">稿件合集</a>
+                <a href="#" class="btn">关于我</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2026 月岛怜Reii | reii.live
         </div>
     </div>
-
-    <footer>&copy; 2025 Reii.live | 虚拟主播个人网站</footer>
 </body>
 </html>
