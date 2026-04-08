@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reii | 虚拟主播</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a103c 0%, #6441a5 50%, #ff79c6 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .avatar {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 2rem auto;
+            display: block;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 30px #ff79c6;
+            object-fit: cover;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 15px #ff79c6;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h2 {
+            margin-bottom: 1rem;
+            color: #ffb9de;
+        }
+
+        .card p {
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            background: rgba(255, 121, 198, 0.2);
+            border: 2px solid #ff79c6;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #ff79c6;
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px #ff79c6;
+        }
+
+        .schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .day {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://picsum.photos/id/301/300/300" alt="Reii" class="avatar">
+        <h1 class="title">Reii</h1>
+        <p class="subtitle">虚拟主播 | 可爱系 | 杂谈 & 游戏</p>
+
+        <div class="card">
+            <h2>🌟 关于我</h2>
+            <p>这里是 Reii，一名来自虚拟世界的可爱系主播～喜欢聊天、打游戏、唱歌，也喜欢和大家贴贴！感谢你来到我的小世界，今后请多多指教啦 ✨</p>
+        </div>
+
+        <div class="links">
+            <a class="btn" href="#">B站</a>
+            <a class="btn" href="#">抖音</a>
+            <a class="btn" href="#">YouTube</a>
+            <a class="btn" href="#">粉丝群</a>
+        </div>
+
+        <div class="card">
+            <h2>📅 直播日程</h2>
+            <div class="schedule">
+                <div class="day">周一 休息</div>
+                <div class="day">周二 20:00 游戏</div>
+                <div class="day">周三 20:00 杂谈</div>
+                <div class="day">周四 休息</div>
+                <div class="day">周五 21:00 歌回</div>
+                <div class="day">周六 20:00 随机</div>
+                <div class="day">周日 20:00 随机</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎵 作品展示</h2>
+            <p>翻唱 / 原创歌曲 / 模型展示 / 短视频</p>
+        </div>
+    </div>
+
+    <footer>&copy; 2025 Reii.live | 虚拟主播个人网站</footer>
+</body>
+</html>
