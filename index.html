@@ -95,7 +95,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="content-wrapper">
 <div class="home-container" id="homeContent">
 <div class="avatar"></div>
-<h1 class="name">月岛怜</h1>
+<h1 class="name">Tsukishima Rei</h1>
 <div class="tag">
 <span class="tag-english">Tsukishima Rei</span>
 <span class="tag-chinese">海上红茶馆Mirage的打工猫，不是笨蛋> <</span>
@@ -200,248 +200,412 @@ const REPO_OWNER = "reiilive"
 const REPO_NAME = "reiilive.github.io"
 // =================================================================
 
-// 调用 GitHub Actions 代理
+// 调用 GitHub Actions 代理（优化版，加重试+加长等待）
 async function callProxy(action, data) {
-  try {
-    // 触发 Actions 工作流
-    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        event_type: 'message_action',
-        client_payload: {
-          data: JSON.stringify({ action, data })
-        }
-      })
-    });
+  // 重试3次，提高成功率
+  for (let retry = 0; retry < 3; retry++) {
+    try {
+      console.log(`第${retry+1}次尝试调用Actions，动作：${action}`);
+      
+      // 1. 触发 Actions 工作流
+      const dispatchResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        },
+        body: JSON.stringify({
+          event_type: 'message_action',
+          client_payload: {
+            action: action,
+            data: data
+          }
+        }),
+        // 加长超时时间
+        timeout: 15000
+      });
 
-    if (!response.ok) throw new Error('请求失败');
-    
-    // 等待 Actions 执行完成（最多等5秒）
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // 查询 Actions 执行结果
-    const runsRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?event=repository_dispatch&per_page=1`);
-    const runs = await runsRes.json();
-    if (runs.workflow_runs.length === 0) throw new Error('未找到执行记录');
-    
-    const runId = runs.workflow_runs[0].id;
-    const logsRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}/logs`, {
-      headers: { 'Accept': 'application/vnd.github.v3+json' }
-    });
-    
-    const logsText = await logsRes.text();
-    const resultMatch = logsText.match(/{"status":\d+,"body":".+?"}/);
-    if (!resultMatch) throw new Error('解析结果失败');
-    
-    const result = JSON.parse(resultMatch[0]);
-    return {
-      success: result.status >= 200 && result.status < 300,
-      data: JSON.parse(result.body || '{}')
-    };
-  } catch (e) {
-    console.error('代理调用失败:', e);
-    return { success: false, error: e.message };
+      if (!dispatchResponse.ok) {
+        throw new Error(`触发Actions失败：${dispatchResponse.status} ${dispatchResponse.statusText}`);
+      }
+      
+      // 2. 等待Actions启动并执行（加长到8秒）
+      await new Promise(resolve => setTimeout(resolve, 8000));
+      
+      // 3. 获取最新的运行记录
+      const runsResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?event=repository_dispatch&per_page=1`, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' },
+        timeout: 10000
+      });
+      
+      const runsData = await runsResponse.json();
+      if (!runsData.workflow_runs || runsData.workflow_runs.length === 0) {
+        throw new Error('未找到Actions执行记录');
+      }
+      
+      const runId = runsData.workflow_runs[0].id;
+      console.log(`找到Actions运行ID：${runId}`);
+      
+      // 4. 等待运行完成（最多等10秒）
+      let runStatus = 'in_progress';
+      let checkCount = 0;
+      while (runStatus === 'in_progress' && checkCount < 10) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const statusResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}`, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' }
+        });
+        const statusData = await statusResponse.json();
+        runStatus = statusData.status || 'completed';
+        checkCount++;
+      }
+      
+      // 5. 获取运行日志并解析结果
+      const logsResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}/logs`, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' },
+        timeout: 10000
+      });
+      
+      const logsText = await logsResponse.text();
+      const resultMatch = logsText.match(/{"status":\d+,"body":".*?"}/);
+      
+      if (!resultMatch) {
+        throw new Error('无法解析Actions执行结果');
+      }
+      
+      const result = JSON.parse(resultMatch[0]);
+      return {
+        success: result.status >= 200 && result.status < 300,
+        data: JSON.parse(result.body || '{}'),
+        error: null
+      };
+      
+    } catch (error) {
+      console.error(`第${retry+1}次调用失败：`, error.message);
+      // 如果是最后一次重试，返回失败
+      if (retry === 2) {
+        return {
+          success: false,
+          data: {},
+          error: `请求失败（已重试3次）：${error.message}`
+        };
+      }
+      // 重试前等待2秒
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
   }
+  
+  // 兜底返回
+  return {
+    success: false,
+    data: {},
+    error: '多次重试仍无法完成请求，请稍后再试'
+  };
 }
 
+// 生成8位随机ID
 function randId() {
-  const c = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  let r = ""
-  for (let i = 0; i < 8; i++) r += c[Math.floor(Math.random() * c.length)]
-  return r
-}
-
-function fmtTime(s) {
-  const d = new Date(s)
-  const year = d.getFullYear()
-  const month = String(d.getMonth()+1).padStart(2,"0")
-  const day = String(d.getDate()).padStart(2,"0")
-  const h = String(d.getHours()).padStart(2,"0")
-  const m = String(d.getMinutes()).padStart(2,"0")
-  const sec = String(d.getSeconds()).padStart(2,"0")
-  return `${year}-${month}-${day} ${h}:${m}:${sec}`
-}
-
-// 留言板加载
-async function loadMb() {
-  const res = await callProxy('getMessages', {});
-  const mbList = document.getElementById("mbList")
-  const noMb = document.getElementById("noMb")
-  mbList.innerHTML = ""
-  
-  if (!res.success || !res.data.length) {
-    noMb.style.display = "block";
-    return;
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let id = "";
+  for (let i = 0; i < 8; i++) {
+    id += chars[Math.floor(Math.random() * chars.length)];
   }
+  return id;
+}
+
+// 格式化时间
+function fmtTime(timeStr) {
+  const date = new Date(timeStr);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  const second = String(date.getSeconds()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
+// 加载留言板数据
+async function loadMb() {
+  const mbList = document.getElementById("mbList");
+  const noMb = document.getElementById("noMb");
+  mbList.innerHTML = "";
   
-  noMb.style.display = "none"
-  res.data.sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
-  res.data.forEach(i => {
-    const name = i.title.replace(/^\[.*\] /, "")
-    const time = fmtTime(i.created_at)
-    const body = i.body || ""
-    const el = document.createElement("div")
-    el.className = "mb-item"
-    el.innerHTML = `
-    <div class="mb-header">
-      <span class="mb-userid">${name}</span>
-      <span class="mb-time">${time}</span>
-    </div>
-    <div class="mb-content">${body.replace(/\n/g,"<br>")}</div>
-    `
-    mbList.appendChild(el)
-  })
+  try {
+    const result = await callProxy("getMessages", {});
+    
+    if (result.success && result.data.length > 0) {
+      noMb.style.display = "none";
+      // 按时间倒序排列
+      result.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      result.data.forEach(item => {
+        const name = item.title.replace(/^\[MB\] /, "");
+        const time = fmtTime(item.created_at);
+        const content = item.body || "";
+        
+        const mbItem = document.createElement("div");
+        mbItem.className = "mb-item";
+        mbItem.innerHTML = `
+          <div class="mb-header">
+            <span class="mb-userid">${name}</span>
+            <span class="mb-time">${time}</span>
+          </div>
+          <div class="mb-content">${content.replace(/\n/g, "<br>")}</div>
+        `;
+        mbList.appendChild(mbItem);
+      });
+    } else {
+      noMb.style.display = "block";
+    }
+  } catch (error) {
+    console.error("加载留言失败：", error);
+    noMb.style.display = "block";
+    noMb.textContent = "加载留言失败，请稍后再试";
+  }
 }
 
 // 提交留言
-document.getElementById("submitMb").onclick = async () => {
-  const name = document.getElementById("mbName").value.trim()
-  const content = document.getElementById("mbContent").value.trim()
-  const tip = document.getElementById("mbTip")
+document.getElementById("submitMb").addEventListener("click", async () => {
+  const nameInput = document.getElementById("mbName");
+  const contentInput = document.getElementById("mbContent");
+  const tip = document.getElementById("mbTip");
   
-  if (!name || !content) {
-    tip.textContent = "昵称和内容都不能为空";
+  const name = nameInput.value.trim();
+  const content = contentInput.value.trim();
+  
+  if (!name) {
+    tip.textContent = "请输入你的昵称/ID";
+    tip.style.color = "#e66786";
     return;
   }
-  
-  tip.textContent = "提交中...";
-  const res = await callProxy('addMessage', { name, content });
-  
-  if (res.success) {
-    tip.textContent = "提交成功！";
-    document.getElementById("mbName").value = "";
-    document.getElementById("mbContent").value = "";
-    loadMb();
-  } else {
-    tip.textContent = "提交失败：" + (res.error || "网络问题");
-  }
-}
-
-// 提交提问
-document.getElementById("submitQ").onclick = async () => {
-  const content = document.getElementById("qContent").value.trim()
-  const tip = document.getElementById("qTip")
-  const resBox = document.getElementById("qResult")
-  const idText = document.getElementById("qIdText")
   
   if (!content) {
-    tip.textContent = "请输入内容";
+    tip.textContent = "请输入留言内容";
+    tip.style.color = "#e66786";
     return;
   }
   
-  const rid = randId();
-  tip.textContent = "提交中...";
-  const res = await callProxy('addQuestion', { id: rid, content });
+  tip.textContent = "提交中...请稍候（可能需要10秒左右）";
+  tip.style.color = "#433469";
   
-  if (res.success) {
-    resBox.style.display = "block";
-    idText.textContent = rid;
-    tip.textContent = "";
-    document.getElementById("qContent").value = "";
-  } else {
-    tip.textContent = "提交失败：" + (res.error || "网络问题");
-    resBox.style.display = "none";
+  try {
+    const result = await callProxy("addMessage", { name, content });
+    
+    if (result.success) {
+      tip.textContent = "提交成功！";
+      tip.style.color = "#2ecc71";
+      // 清空输入框
+      nameInput.value = "";
+      contentInput.value = "";
+      // 重新加载留言列表
+      setTimeout(loadMb, 1000);
+    } else {
+      tip.textContent = `提交失败：${result.error || "未知错误"}`;
+      tip.style.color = "#e66786";
+    }
+  } catch (error) {
+    tip.textContent = `提交失败：${error.message}`;
+    tip.style.color = "#e66786";
   }
-}
+});
+
+// 提交提问
+document.getElementById("submitQ").addEventListener("click", async () => {
+  const contentInput = document.getElementById("qContent");
+  const tip = document.getElementById("qTip");
+  const resultBox = document.getElementById("qResult");
+  const idText = document.getElementById("qIdText");
+  
+  const content = contentInput.value.trim();
+  
+  if (!content) {
+    tip.textContent = "请输入你的提问内容";
+    tip.style.color = "#e66786";
+    return;
+  }
+  
+  tip.textContent = "提交中...请稍候（可能需要10秒左右）";
+  tip.style.color = "#433469";
+  resultBox.style.display = "none";
+  
+  try {
+    const questionId = randId();
+    const result = await callProxy("addQuestion", { id: questionId, content });
+    
+    if (result.success) {
+      tip.textContent = "提交成功！请保存你的查询ID";
+      tip.style.color = "#2ecc71";
+      idText.textContent = questionId;
+      resultBox.style.display = "block";
+      // 清空输入框
+      contentInput.value = "";
+    } else {
+      tip.textContent = `提交失败：${result.error || "未知错误"}`;
+      tip.style.color = "#e66786";
+    }
+  } catch (error) {
+    tip.textContent = `提交失败：${error.message}`;
+    tip.style.color = "#e66786";
+  }
+});
 
 // 查询回复
-document.getElementById("checkBtn").onclick = async () => {
-  const id = document.getElementById("checkId").value.trim()
-  const tip = document.getElementById("checkTip")
-  const resBox = document.getElementById("checkResult")
-  const qBox = document.getElementById("showQuestion")
-  const rBox = document.getElementById("showReply")
+document.getElementById("checkBtn").addEventListener("click", async () => {
+  const idInput = document.getElementById("checkId");
+  const tip = document.getElementById("checkTip");
+  const resultBox = document.getElementById("checkResult");
+  const questionEl = document.getElementById("showQuestion");
+  const replyEl = document.getElementById("showReply");
   
-  if (!id || id.length !== 8) {
-    tip.textContent = "请输入8位ID";
+  const questionId = idInput.value.trim();
+  
+  if (!questionId || questionId.length !== 8) {
+    tip.textContent = "请输入8位查询ID";
+    tip.style.color = "#e66786";
     return;
   }
   
-  tip.textContent = "查询中...";
-  const res = await callProxy('getQuestion', { id });
+  tip.textContent = "查询中...请稍候";
+  tip.style.color = "#433469";
+  resultBox.style.display = "none";
   
-  if (res.success && res.data.question) {
-    qBox.textContent = "提问：" + res.data.question;
-    rBox.textContent = res.data.reply ? "回复：" + res.data.reply : "暂未回复";
-    resBox.style.display = "block";
-    tip.textContent = "";
-  } else {
-    tip.textContent = "未找到该ID或查询失败";
-    resBox.style.display = "none";
+  try {
+    const result = await callProxy("getQuestion", { id: questionId });
+    
+    if (result.success && result.data.question) {
+      tip.textContent = "查询成功！";
+      tip.style.color = "#2ecc71";
+      questionEl.textContent = `提问：${result.data.question}`;
+      replyEl.textContent = result.data.reply ? `回复：${result.data.reply}` : "暂无回复";
+      resultBox.style.display = "block";
+    } else {
+      tip.textContent = "未找到该ID的提问记录";
+      tip.style.color = "#e66786";
+    }
+  } catch (error) {
+    tip.textContent = `查询失败：${error.message}`;
+    tip.style.color = "#e66786";
   }
-}
+});
 
-// 侧边栏路由
-const sidebar = document.getElementById("sidebar")
-const overlay = document.getElementById("overlay")
-document.getElementById("menuToggle").onclick = () => {
-  sidebar.classList.toggle("open")
-  overlay.classList.toggle("show")
-}
-overlay.onclick = () => {
-  sidebar.classList.remove("open")
-  overlay.classList.remove("show")
-}
+// 侧边栏控制
+document.getElementById("menuToggle").addEventListener("click", () => {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  sidebar.classList.toggle("open");
+  overlay.classList.toggle("show");
+});
 
-function show(p) {
-  document.getElementById("homeContent").classList.add("hidden")
-  document.getElementById("playlistContent").classList.remove("show")
-  document.getElementById("cottonCandyContent").classList.remove("show")
-  document.getElementById("messageBoardContent").classList.remove("show")
+document.getElementById("overlay").addEventListener("click", () => {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+});
+
+// 页面切换
+function show(page) {
+  // 隐藏所有页面
+  document.getElementById("homeContent").classList.add("hidden");
+  document.getElementById("playlistContent").classList.remove("show");
+  document.getElementById("cottonCandyContent").classList.remove("show");
+  document.getElementById("messageBoardContent").classList.remove("show");
   
-  if (p === "home") document.getElementById("homeContent").classList.remove("hidden")
-  if (p === "music") document.getElementById("playlistContent").classList.add("show")
-  if (p === "cc") document.getElementById("cottonCandyContent").classList.add("show")
-  if (p === "mb") {
-    document.getElementById("messageBoardContent").classList.add("show")
-    loadMb()
+  // 显示目标页面
+  if (page === "home") {
+    document.getElementById("homeContent").classList.remove("hidden");
+  } else if (page === "music") {
+    document.getElementById("playlistContent").classList.add("show");
+  } else if (page === "cc") {
+    document.getElementById("cottonCandyContent").classList.add("show");
+  } else if (page === "mb") {
+    document.getElementById("messageBoardContent").classList.add("show");
+    // 加载留言板数据
+    loadMb();
   }
+  
+  // 关闭侧边栏
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
 }
 
-document.getElementById("navHome").onclick = () => show("home")
-document.getElementById("navPlaylist").onclick = () => show("music")
-document.getElementById("navCottonCandy").onclick = () => show("cc")
-document.getElementById("navMessageBoard").onclick = () => show("mb")
+// 绑定导航按钮事件
+document.getElementById("navHome").addEventListener("click", () => show("home"));
+document.getElementById("navPlaylist").addEventListener("click", () => show("music"));
+document.getElementById("navCottonCandy").addEventListener("click", () => show("cc"));
+document.getElementById("navMessageBoard").addEventListener("click", () => show("mb"));
 
 // 棉花糖标签切换
-document.querySelectorAll(".cc-tab").forEach(t => {
-  t.onclick = () => {
-    document.querySelectorAll(".cc-tab").forEach(x => x.classList.remove("active"))
-    document.querySelectorAll(".cc-panel").forEach(x => x.classList.remove("active"))
-    t.classList.add("active")
-    document.getElementById(t.dataset.panel + "Panel").classList.add("active")
-  }
-})
+document.querySelectorAll(".cc-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    // 移除所有active类
+    document.querySelectorAll(".cc-tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".cc-panel").forEach(p => p.classList.remove("active"));
+    // 添加当前active类
+    tab.classList.add("active");
+    const panelId = tab.dataset.panel + "Panel";
+    document.getElementById(panelId).classList.add("active");
+  });
+});
 
-// 歌单搜索
-const songSearch = document.getElementById("songSearch")
-const songTableBody = document.getElementById("songTableBody")
-const oriRows = Array.from(songTableBody.querySelectorAll("tr"))
-songSearch.oninput = () => {
-  const v = songSearch.value.toLowerCase()
-  const show = oriRows.filter(r => r.textContent.toLowerCase().includes(v))
-  songTableBody.innerHTML = ""
-  show.forEach(r => songTableBody.appendChild(r))
-  document.getElementById("noResult").style.display = show.length ? "none" : "block"
-}
+// 歌单搜索功能
+document.getElementById("songSearch").addEventListener("input", () => {
+  const searchValue = document.getElementById("songSearch").value.toLowerCase().trim();
+  const songTableBody = document.getElementById("songTableBody");
+  const noResult = document.getElementById("noResult");
+  const rows = songTableBody.querySelectorAll("tr");
+  
+  let hasMatch = false;
+  
+  rows.forEach(row => {
+    const songName = row.cells[0].textContent.toLowerCase();
+    const singerName = row.cells[1].textContent.toLowerCase();
+    
+    if (songName.includes(searchValue) || singerName.includes(searchValue)) {
+      row.style.display = "";
+      hasMatch = true;
+    } else {
+      row.style.display = "none";
+    }
+  });
+  
+  noResult.style.display = hasMatch ? "none" : "block";
+});
 
-// 直播状态
-async function live() {
+// 检测直播状态
+async function checkLiveStatus() {
   try {
-    const r = await fetch("https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1748139065")
-    const j = await r.json()
-    const s = j.data?.live_status
-    const el = document.getElementById("liveStatus")
-    el.textContent = s === 1 ? "正在直播" : "未开播"
-  } catch (e) {
-    document.getElementById("liveStatus").textContent = "检测失败"
+    const response = await fetch("https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1748139065");
+    const data = await response.json();
+    
+    if (data.code === 0 && data.data) {
+      const liveStatus = data.data.live_status;
+      const liveStatusEl = document.getElementById("liveStatus");
+      
+      if (liveStatus === 1) {
+        liveStatusEl.textContent = "正在直播中 🎉";
+        liveStatusEl.style.color = "#e66786";
+      } else {
+        liveStatusEl.textContent = "当前未直播";
+        liveStatusEl.style.color = "#9d79d6";
+      }
+    }
+  } catch (error) {
+    console.error("检测直播状态失败：", error);
+    document.getElementById("liveStatus").textContent = "无法检测直播状态";
   }
 }
-live()
+
+// 页面加载完成后执行
+window.addEventListener("DOMContentLoaded", () => {
+  // 显示首页
+  show("home");
+  // 检测直播状态
+  checkLiveStatus();
+  // 每隔5分钟刷新一次直播状态
+  setInterval(checkLiveStatus, 300000);
+});
 </script>
 </body>
 </html>
