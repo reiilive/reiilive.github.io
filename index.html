@@ -40,10 +40,6 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .song-table tr:hover{background:rgba(212,209,240,0.1)}
 .no-result{text-align:center;padding:2rem;color:#433469;display:none}
 
-/* 泡米提问箱容器样式（适配嵌入） */
-.pome-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;height:700px;/* 适配提问箱高度 */}
-.pome-iframe{width:100%;height:100%;border:none;border-radius:12px;/* 去掉iframe边框，和页面融合 */}
-
 .footer{margin-top:2rem;font-size:0.8rem;color:#433469;text-align:center;padding-bottom:2rem}
 .hidden{display:none!important}
 .show{display:block!important}
@@ -55,8 +51,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="sidebar-title">导航菜单</div>
 <div class="sidebar-btn" id="navHome">首页</div>
 <div class="sidebar-btn" id="navPlaylist">歌单</div>
-<!-- 改为点击显示嵌入的泡米提问箱 -->
-<div class="sidebar-btn" id="navPome">提问箱</div>
+<!-- 侧边栏提问箱改为跳转链接（指向指定的dreamail地址） -->
+<a href="https://dreamail.cn/send?dm=b1c26b71-7cf6-4890-aeef-ce2d6d9d4dc0" class="sidebar-btn" target="_blank">提问箱</a>
 <div class="sidebar-btn">舰礼留档</div>
 <div class="sidebar-btn">资源下载</div>
 <div class="sidebar-btn">关于Reii</div>
@@ -93,8 +89,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="links">
 <a href="https://space.bilibili.com/90566661" class="btn" target="_blank">B站主页</a>
 <a href="https://live.bilibili.com/1748139065" class="btn" target="_blank">直播间</a>
-<!-- 首页快捷入口也改为显示嵌入的提问箱 -->
-<div class="btn" id="homePomeBtn">提问箱</div>
+<!-- 已删除首页的提问箱按钮 -->
 </div>
 </div>
 </div>
@@ -127,11 +122,6 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </table>
 </div>
 
-<!-- 泡米提问箱嵌入容器 -->
-<div class="pome-container" id="pomeContent">
-<iframe class="pome-iframe" src="https://www.pome.vip/ask/reiilive" sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-top-navigation"></iframe>
-</div>
-
 </div>
 
 <div class="footer">© 2026 月岛怜Reii | reii.live</div>
@@ -152,23 +142,17 @@ document.getElementById("overlay").addEventListener("click", () => {
   overlay.classList.remove("show");
 });
 
-// 页面切换（新增泡米提问箱切换逻辑）
+// 页面切换（仅保留首页/歌单）
 function show(page) {
-  // 隐藏所有内容容器
   document.getElementById("homeContent").classList.add("hidden");
   document.getElementById("playlistContent").classList.remove("show");
-  document.getElementById("pomeContent").classList.remove("show");
   
-  // 根据传入页面显示对应内容
   if (page === "home") {
     document.getElementById("homeContent").classList.remove("hidden");
   } else if (page === "music") {
     document.getElementById("playlistContent").classList.add("show");
-  } else if (page === "pome") {
-    document.getElementById("pomeContent").classList.add("show");
   }
   
-  // 关闭侧边栏和遮罩
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("overlay").classList.remove("show");
 }
@@ -176,9 +160,6 @@ function show(page) {
 // 绑定导航点击事件
 document.getElementById("navHome").addEventListener("click", () => show("home"));
 document.getElementById("navPlaylist").addEventListener("click", () => show("music"));
-document.getElementById("navPome").addEventListener("click", () => show("pome"));
-// 绑定首页提问箱快捷按钮
-document.getElementById("homePomeBtn").addEventListener("click", () => show("pome"));
 
 // 歌单搜索
 document.getElementById("songSearch").addEventListener("input", () => {
