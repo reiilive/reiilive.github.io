@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Redirecting...</title>
-    <script>
-        // 检测当前路径，直接重定向到index.html并保留原路径状态
-        const path = window.location.pathname;
-        // 仅处理/music路径，其他404正常返回
-        if (path === '/music' || path === '/music/') {
-            // 重定向到首页，但保留路由状态
-            window.location.replace('/?route=' + encodeURIComponent(path));
-        } else {
-            // 其他路径跳回首页
-            window.location.replace('/');
-        }
-    </script>
+<meta charset="UTF-8">
+<script>
+const p = location.pathname
+if (['/music','/cotton-candy','/message-board'].includes(p)) {
+  location.href = "/"
+} else {
+  location.href = "/"
+}
+</script>
 </head>
-<body>
-</body>
 </html>
