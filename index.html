@@ -7,25 +7,58 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url(https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/beijing.png);background-position:center center;background-repeat:no-repeat;background-attachment:fixed;background-size:cover;background-color:#f0ebf8;color:#433469;min-height:100vh;overflow-x:hidden}
+
 .sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);z-index:999;transition:0.3s ease;box-shadow:2px 0 15px rgba(0,0,0,0.1);padding:2rem 1.5rem;overflow-y:auto}
 .sidebar.open{left:0}
-.sidebar-title{font-size:1.2rem;font-weight:bold;margin-bottom:2rem;color:#433469;text-align:center}
-.sidebar-btn{display:block;width:100%;padding:1rem;margin:0.5rem 0;background:rgba(212,209,240,0.5);border-radius:12px;text-align:center;color:#433469;text-decoration:none;font-weight:bold;transition:0.2s;cursor:pointer}
+.sidebar-title{font-size:1.2rem;font-weight:bold;margin-bottom:2rem;color:#433469;text-align:center;/* 导航标题也居中更协调 */}
+/* 修改：所有导航按钮都居中 */
+.sidebar-btn{display:block;width:100%;padding:1rem;margin:0.5rem 0;background:rgba(212,209,240,0.5);border-radius:12px;color:#433469;text-decoration:none;font-weight:bold;transition:0.2s;cursor:pointer;text-align:center;}
 .sidebar-btn:hover{background:#433469;color:#fff}
 .menu-toggle{position:fixed;top:20px;left:20px;width:44px;height:44px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;z-index:998;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
 .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:888;opacity:0;pointer-events:none;transition:0.3s}
 .overlay.show{opacity:1;pointer-events:all}
-.content-wrapper{max-width:900px;margin:0 auto;padding:2rem;margin-top:3rem}
-.home-container{max-width:700px;margin:0 auto;text-align:center;background:rgba(255,255,255,0.3);padding:2rem;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,0.08);backdrop-filter:blur(2px);border:1px solid rgba(255,255,255,0.5);position:relative;z-index:1}
-/* 修复头像路径+样式 */
+.content-wrapper{max-width:900px;margin:0 auto;padding:2rem;margin-top:3rem;
+  opacity: 1; /* 移除视频后直接显示内容 */
+}
+/* 修复动画：从下到上平滑渐入，无突兀感 */
+.home-container{
+  max-width:700px;
+  margin:0 auto;
+  background:rgba(255,255,255,0.3);
+  padding:2rem;
+  border-radius:24px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.08);
+  backdrop-filter:blur(2px);
+  border:1px solid rgba(255,255,255,0.5);
+  position:relative;
+  z-index:1;
+  /* 修复动画初始状态 - 只保留动画属性，移除手动设置的初始值 */
+  animation: fadeInUp 1s ease-out 0.3s forwards;
+  text-align: center; /* 新增：首页内容整体居中 */
+}
+/* 定义渐入上移动画 */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); /* 初始在下方 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0); /* 最终到原位 */
+  }
+}
 .avatar{width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid rgba(212,209,240,0.8);box-shadow:0 0 15px rgba(212,209,240,0.6);margin:0 auto 1rem;background:#eeebf7;display:block;background:url(https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/260409touxiang.png) center/cover no-repeat}
 .name{font-size:2.2rem;color:#433469;margin-bottom:0.1rem;text-shadow:0 1px 2px rgba(255,255,255,0.6)}
 .tag{margin-bottom:2rem;text-shadow:0 1px 1px rgba(255,255,255,0.6);line-height:1.8}
 .tag-english{font-size:1.3rem;font-weight:600;color:#433469;display:block}
 .tag-chinese{font-size:1rem;color:#433469;display:block}
-.section{background:rgba(255,255,255,0.4);border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.05);text-align:center;border:1px solid rgba(255,255,255,0.6)}
+.section{background:rgba(255,255,255,0.4);border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.05);border:1px solid rgba(255,255,255,0.6);
+  text-align: center; /* 新增：首页section内容居中 */
+}
 .section h2{font-size:1.2rem;margin-bottom:1rem}
-.live-info{line-height:1.8;font-size:0.95rem}
+.live-info{line-height:1.8;font-size:0.95rem;
+  text-align: center; /* 新增：直播信息文本居中 */
+}
 .live-status{margin-top:1.2rem;font-weight:900;font-size:1.3rem;color:#e66786;letter-spacing:0.5px}
 .links{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1rem}
 .btn{padding:0.7rem 1.4rem;border-radius:30px;background:rgba(212,209,240,0.7);color:#433469;text-decoration:none;font-weight:bold;transition:all 0.2s;box-shadow:0 2px 8px rgba(212,209,240,0.1);border:1px solid rgba(255,255,255,0.7)}
@@ -35,37 +68,54 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .search-bar{margin-bottom:2rem}
 .search-input{width:100%;padding:0.8rem 1.2rem;border-radius:8px;border:1px solid #d4d1f0;background:rgba(255,255,255,0.9);color:#433469;font-size:1rem;outline:none}
 .song-table{width:100%;border-collapse:collapse}
-.song-table th,.song-table td{padding:1rem;text-align:left;border-bottom:1px solid #d4d1f0;color:#433469}
+.song-table th,.song-table td{padding:1rem;border-bottom:1px solid #d4d1f0;color:#433469}
 .song-table th{font-weight:bold;background:rgba(212,209,240,0.2)}
 .song-table tr:hover{background:rgba(212,209,240,0.1)}
-.no-result{text-align:center;padding:2rem;color:#433469;display:none}
+.no-result{padding:2rem;color:#433469;display:none}
 
-/* 舰礼留档容器样式 */
 .gift-record-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none}
-/* 折叠项样式 */
 .gift-item{border:1px solid #d4d1f0;border-radius:16px;margin-bottom:1rem;overflow:hidden;transition:all 0.3s ease}
-/* 折叠头部（收起状态） */
 .gift-item-header{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 1.5rem;background:rgba(212,209,240,0.2);cursor:pointer}
 .gift-item-title{font-weight:bold;color:#433469;font-size:1rem}
 .gift-item-toggle{font-size:0.9rem;color:#433469;background:rgba(212,209,240,0.5);padding:0.4rem 0.8rem;border-radius:8px;transition:0.2s}
 .gift-item-toggle:hover{background:#433469;color:#fff}
-/* 折叠内容（展开状态） */
 .gift-item-content{padding:1.5rem;background:rgba(255,255,255,0.9);display:none}
 .gift-item-desc{line-height:1.8;margin-bottom:1.5rem;color:#433469}
 .gift-item-btns{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
 .gift-btn{padding:0.7rem 1.2rem;border-radius:8px;border:none;background:#d4d1f0;color:#433469;font-weight:bold;cursor:pointer;transition:0.2s}
 .gift-btn:hover{background:#433469;color:#fff}
-/* 新增：活动长图展示容器样式 */
 .gift-img-container{width:100%;overflow:auto;margin-top:1rem;border-radius:8px;border:1px solid #d4d1f0;display:none}
 .gift-img{width:100%;height:auto;display:block}
-/* 二维码弹窗样式 */
-.qrcode-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:0.3s}
+/* 二维码弹窗真正居中优化（仅保留这个居中） */
+.qrcode-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;opacity:0;pointer-events:none;transition:0.3s}
 .qrcode-modal.show{opacity:1;pointer-events:all}
-.qrcode-content{background:#fff;padding:2rem;border-radius:16px;max-width:90%;text-align:center}
-.qrcode-img{max-width:300px;height:auto;border-radius:8px;margin-bottom:1rem}
+.qrcode-content{background:#fff;padding:2rem;border-radius:16px;max-width:90%;width:350px;/* 固定宽度更美观 */
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);/* 真正的绝对居中 */
+}
+.qrcode-img{max-width:300px;height:auto;border-radius:8px;margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;/* 图片居中 */}
 .close-qrcode{padding:0.7rem 1.5rem;background:#433469;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:1rem}
 
-.footer{margin-top:2rem;font-size:0.8rem;color:#433469;text-align:center;padding-bottom:2rem}
+/* 商务合作页面样式 - 新增内容居中 */
+.business-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;line-height:2;
+  text-align: center; /* 新增：商务合作内容整体居中 */
+}
+.business-container h2{margin-bottom:2rem;color:#433469;font-size:1.5rem}
+.business-section{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #d4d1f0}
+.business-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.business-section h3{color:#433469;margin-bottom:1rem;font-size:1.2rem}
+.business-section p{margin-bottom:0.5rem}
+
+/* 关于本站页面样式 - 简化排版，取消分段和标题 + 新增内容居中 */
+.about-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;line-height:2;
+  text-align: center; /* 新增：关于本站内容整体居中 */
+}
+.about-container h2{margin-bottom:2rem;color:#433469;font-size:1.5rem}
+.about-container p{margin-bottom:1rem}
+
+.footer{margin-top:2rem;font-size:0.8rem;color:#433469;padding-bottom:2rem;text-align:center}
 .hidden{display:none!important}
 .show{display:block!important}
 </style>
@@ -76,22 +126,23 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="sidebar-title">导航菜单</div>
 <div class="sidebar-btn" id="navHome">首页</div>
 <div class="sidebar-btn" id="navPlaylist">歌单</div>
-<!-- 侧边栏提问箱改为跳转链接（指向指定的dreamail地址） -->
 <a href="https://dreamail.cn/send?dm=b1c26b71-7cf6-4890-aeef-ce2d6d9d4dc0" class="sidebar-btn" target="_blank">提问箱</a>
 <div class="sidebar-btn" id="navGiftRecord">舰礼留档</div>
 <div class="sidebar-btn">资源下载</div>
-<div class="sidebar-btn">关于Reii</div>
-<a href="https://live.bilibili.com/1748139065" class="sidebar-btn" target="_blank">Reii的直播间</a>
+<!-- 调整直播间和主页顺序 -->
 <a href="https://space.bilibili.com/90566661" class="sidebar-btn" target="_blank">Reii的主页</a>
-<div class="sidebar-btn">合作联系</div>
+<a href="https://live.bilibili.com/1748139065" class="sidebar-btn" target="_blank">Reii的直播间</a>
+<!-- 分开商务合作和关于本站 -->
+<div class="sidebar-btn" id="navBusiness">商务合作</div>
+<div class="sidebar-btn" id="navAbout">关于本站</div>
 </div>
 
 <div class="menu-toggle" id="menuToggle">☰</div>
 <div class="overlay" id="overlay"></div>
 
-<div class="content-wrapper">
+<div class="content-wrapper" id="mainContent">
+<!-- 首页内容 -->
 <div class="home-container" id="homeContent">
-<!-- 头像已修复 -->
 <div class="avatar"></div>
 <h1 class="name">月岛怜</h1>
 <div class="tag">
@@ -100,7 +151,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </div>
 
 <div class="section">
-<h2>🎤 直播信息</h2>
+<h2>直播信息</h2>
 <div class="live-info">
 直播平台：Bilibili<br>
 直播时间：20:00 午台随机掉落 周二定休<br>
@@ -110,21 +161,27 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </div>
 
 <div class="section">
-<h2>🔗 快速前往</h2>
+<h2>快速前往</h2>
 <div class="links">
 <a href="https://space.bilibili.com/90566661" class="btn" target="_blank">B站主页</a>
 <a href="https://live.bilibili.com/1748139065" class="btn" target="_blank">直播间</a>
-<!-- 已删除首页的提问箱按钮 -->
 </div>
 </div>
 </div>
 
+<!-- 歌单内容 - 恢复完整的表头和内容 -->
 <div class="playlist-container" id="playlistContent">
 <div class="search-bar">
 <input type="text" class="search-input" id="songSearch" placeholder="搜索歌曲/歌手">
 </div>
 <div class="no-result" id="noResult">暂无匹配</div>
 <table class="song-table">
+<thead>
+  <tr>
+    <th>歌曲名</th>
+    <th>歌手</th>
+  </tr>
+</thead>
 <tbody id="songTableBody">
 <tr><td>A.I.N.Y.</td><td>邓紫棋</td></tr>
 <tr><td>All of Me</td><td>John Legend</td></tr>
@@ -147,42 +204,36 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </table>
 </div>
 
-<!-- 舰礼留档容器 -->
+<!-- 舰礼留档内容 -->
 <div class="gift-record-container" id="giftRecordContent">
-  <h2 style="text-align:center;margin-bottom:2rem;color:#433469;font-size:1.5rem">📜 舰礼留档</h2>
+  <h2 style="margin-bottom:2rem;color:#433469;font-size:1.5rem">舰礼留档</h2>
   
-  <!-- 第一条：202604 出道月活动 -->
   <div class="gift-item">
     <div class="gift-item-header" onclick="toggleGiftItem('gift1')">
       <div class="gift-item-title">202604 出道月活动</div>
       <div class="gift-item-toggle" id="gift1Toggle">展开</div>
     </div>
     <div class="gift-item-content" id="gift1Content">
-      <!-- 简化描述：只保留核心标题，详细内容靠图片体现 -->
       <div class="gift-item-desc">
         <strong>活动时间：</strong>2026年4月10日 - 2026年5月10日<br>
         <strong>活动主题：</strong>月岛怜出道纪念
       </div>
       <div class="gift-item-btns">
-        <!-- 修改：点击按钮展示/隐藏长图，不再跳转外链 -->
         <button class="gift-btn" onclick="toggleGiftImg('gift1Img')">活动详细页</button>
         <button class="gift-btn" onclick="showQrcode('qrcode1')">填写</button>
       </div>
-      <!-- 新增：出道月活动长图展示容器 -->
       <div class="gift-img-container" id="gift1Img">
         <img src="https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/2604changtu.png" class="gift-img" alt="出道月活动详情">
       </div>
     </div>
   </div>
 
-  <!-- 第二条：202605 满月活动 -->
   <div class="gift-item">
     <div class="gift-item-header" onclick="toggleGiftItem('gift2')">
       <div class="gift-item-title">202605 满月活动</div>
       <div class="gift-item-toggle" id="gift2Toggle">展开</div>
     </div>
     <div class="gift-item-content" id="gift2Content">
-      <!-- 简化描述：只保留核心标题 -->
       <div class="gift-item-desc">
         <strong>活动时间：</strong>2026年5月11日 - 2026年6月11日<br>
         <strong>活动主题：</strong>月岛怜出道满月纪念
@@ -191,12 +242,39 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
         <button class="gift-btn" onclick="toggleGiftImg('gift2Img')">活动详细页</button>
         <button class="gift-btn" onclick="showQrcode('qrcode2')">填写</button>
       </div>
-      <!-- 满月活动长图容器（后续替换为你的图片地址即可） -->
       <div class="gift-img-container" id="gift2Img">
         <img src="https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/weikaishi.jpg" class="gift-img" alt="满月活动详情">
       </div>
     </div>
   </div>
+</div>
+
+<!-- 商务合作页面 -->
+<div class="business-container" id="businessContent">
+  <h2>商务合作</h2>
+  
+  <div class="business-section">
+    <h3>商务邮箱</h3>
+    <p>reiilive@163.com</p>
+  </div>
+  
+  <div class="business-section">
+    <h3>委托承接</h3>
+    <p>目前接受美工/歌势视频（可代驾）/切片/模型展示等委托</p>
+    <p>做得很快，不忙就接，商私同价</p>
+    <p>其他的也可以来问问，发邮件沟通就好</p>
+  </div>
+</div>
+
+<!-- 关于本站页面 - 简化排版，取消分段和自定义标题 -->
+<div class="about-container" id="aboutContent">
+  <h2>关于本站</h2>
+  
+  <p>作者：月岛怜Reii</p>
+  <p>维护：月岛怜Reii</p>
+  <p>不会代码，网站吹弹可破，路过的佬轻喷喵> <</p>
+  <p>感谢豆包老师</p>
+  <p>感谢聪明的Reii猫 Reii神神了</p>
 </div>
 
 <!-- 二维码弹窗 -->
@@ -228,23 +306,32 @@ document.getElementById("overlay").addEventListener("click", () => {
   overlay.classList.remove("show");
 });
 
-// 页面切换（新增舰礼留档切换）
+// 页面切换 - 修复动画触发逻辑
 function show(page) {
-  // 隐藏所有内容容器
+  // 隐藏所有页面
   document.getElementById("homeContent").classList.add("hidden");
   document.getElementById("playlistContent").classList.remove("show");
   document.getElementById("giftRecordContent").classList.remove("show");
+  document.getElementById("businessContent").classList.remove("show");
+  document.getElementById("aboutContent").classList.remove("show");
   
-  // 显示对应页面
   if (page === "home") {
     document.getElementById("homeContent").classList.remove("hidden");
+    // 修复动画：重新触发时先重置动画状态
+    const homeContainer = document.getElementById("homeContent");
+    homeContainer.style.animation = 'none';
+    homeContainer.offsetHeight; // 强制重绘
+    homeContainer.style.animation = 'fadeInUp 1s ease-out 0.3s forwards';
   } else if (page === "music") {
     document.getElementById("playlistContent").classList.add("show");
   } else if (page === "gift") {
     document.getElementById("giftRecordContent").classList.add("show");
+  } else if (page === "business") {
+    document.getElementById("businessContent").classList.add("show");
+  } else if (page === "about") {
+    document.getElementById("aboutContent").classList.add("show");
   }
   
-  // 关闭侧边栏和遮罩
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("overlay").classList.remove("show");
 }
@@ -253,6 +340,8 @@ function show(page) {
 document.getElementById("navHome").addEventListener("click", () => show("home"));
 document.getElementById("navPlaylist").addEventListener("click", () => show("music"));
 document.getElementById("navGiftRecord").addEventListener("click", () => show("gift"));
+document.getElementById("navBusiness").addEventListener("click", () => show("business"));
+document.getElementById("navAbout").addEventListener("click", () => show("about"));
 
 // 歌单搜索
 document.getElementById("songSearch").addEventListener("input", () => {
@@ -274,16 +363,15 @@ document.getElementById("songSearch").addEventListener("input", () => {
   noResult.style.display = hasMatch ? "none" : "block";
 });
 
-// 修复直播状态检测（改用兼容写法+降级）
+// 直播状态检测
 async function checkLiveStatus() {
   const liveStatusEl = document.getElementById("liveStatus");
   try {
-    // 改用B站主播信息API，更稳定
     const response = await fetch(`https://api.bilibili.com/x/space/acc/info?mid=90566661`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Referer': 'https://space.bilibili.com/' // 解决跨域限制
+        'Referer': 'https://space.bilibili.com/'
       },
       mode: 'cors'
     });
@@ -292,24 +380,21 @@ async function checkLiveStatus() {
     const data = await response.json();
     
     if (data.code === 0) {
-      // 先显示基础状态，避免API限制导致空白
       liveStatusEl.textContent = "当前未直播";
       liveStatusEl.style.color = "#9d79d6";
       
-      // 额外检测直播间状态（备用）
       try {
         const roomRes = await fetch(`https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1748139065`);
         const roomData = await roomRes.json();
         if (roomData.code === 0 && roomData.data.live_status === 1) {
-          liveStatusEl.textContent = "正在直播中 🎉";
+          liveStatusEl.textContent = "正在直播中";
           liveStatusEl.style.color = "#e66786";
         }
-      } catch (e) { /* 备用检测失败不影响主状态 */ }
+      } catch (e) {}
     } else {
       throw new Error('数据解析失败');
     }
   } catch (error) {
-    // 降级处理：显示默认状态，不显示错误
     liveStatusEl.textContent = "当前未直播";
     liveStatusEl.style.color = "#9d79d6";
   }
@@ -321,59 +406,52 @@ function toggleGiftItem(id) {
   const toggleBtn = document.getElementById(`${id}Toggle`);
   
   if (content.style.display === "block") {
-    // 收起（同时隐藏长图）
     content.style.display = "none";
     toggleBtn.textContent = "展开";
-    // 隐藏对应的长图
     const imgContainer = document.getElementById(`${id}Img`);
     if (imgContainer) imgContainer.style.display = "none";
   } else {
-    // 展开
     content.style.display = "block";
     toggleBtn.textContent = "收起";
   }
 }
 
-// 新增：展示/隐藏活动长图
+// 展示/隐藏活动长图
 function toggleGiftImg(id) {
   const imgContainer = document.getElementById(id);
   if (imgContainer.style.display === "block") {
     imgContainer.style.display = "none";
   } else {
     imgContainer.style.display = "block";
-    // 滚动到图片位置（优化体验）
     imgContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
-// 舰礼留档 - 显示二维码弹窗
+// 显示二维码弹窗
 function showQrcode(type) {
   const modal = document.getElementById("qrcodeModal");
   const qrcodeImg = document.getElementById("qrcodeImg");
   
   if (type === "qrcode1") {
-    // 出道月活动二维码链接
     qrcodeImg.src = "https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/2604m.png";
   } else if (type === "qrcode2") {
-    // 满月活动二维码（后续替换为你的地址）
     qrcodeImg.src = "https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/weikaishi.jpg";
   }
   
   modal.classList.add("show");
 }
 
-// 舰礼留档 - 隐藏二维码弹窗
+// 隐藏二维码弹窗
 function hideQrcode() {
   const modal = document.getElementById("qrcodeModal");
   modal.classList.remove("show");
-  document.getElementById("qrcodeImg").src = ""; // 清空图片
+  document.getElementById("qrcodeImg").src = "";
 }
 
 // 初始化
 window.addEventListener("DOMContentLoaded", () => {
   show("home");
   checkLiveStatus();
-  // 降低检测频率，减少API请求（10分钟一次）
   setInterval(checkLiveStatus, 600000);
 });
 </script>
