@@ -8,19 +8,17 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url(https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/beijing.png);background-position:center center;background-repeat:no-repeat;background-attachment:fixed;background-size:cover;background-color:#f0ebf8;color:#433469;min-height:100vh;overflow-x:hidden}
 
-.sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);z-index:999;transition:0.3s ease;box-shadow:2px 0 15px rgba(0,0,0,0.1);padding:2rem 1.5rem;overflow-y:auto}
+.sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:rgba(255,255,255.95);backdrop-filter:blur(10px);z-index:999;transition:0.3s ease;box-shadow:2px 0 15px rgba(0,0,0,0.1);padding:2rem 1.5rem;overflow-y:auto}
 .sidebar.open{left:0}
-.sidebar-title{font-size:1.2rem;font-weight:bold;margin-bottom:2rem;color:#433469;text-align:center;/* 导航标题也居中更协调 */}
-/* 修改：所有导航按钮都居中 */
+.sidebar-title{font-size:1.2rem;font-weight:bold;margin-bottom:2rem;color:#433469;text-align:center;}
 .sidebar-btn{display:block;width:100%;padding:1rem;margin:0.5rem 0;background:rgba(212,209,240,0.5);border-radius:12px;color:#433469;text-decoration:none;font-weight:bold;transition:0.2s;cursor:pointer;text-align:center;}
 .sidebar-btn:hover{background:#433469;color:#fff}
 .menu-toggle{position:fixed;top:20px;left:20px;width:44px;height:44px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;z-index:998;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
 .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:888;opacity:0;pointer-events:none;transition:0.3s}
 .overlay.show{opacity:1;pointer-events:all}
 .content-wrapper{max-width:900px;margin:0 auto;padding:2rem;margin-top:3rem;
-  opacity: 1; /* 移除视频后直接显示内容 */
+  opacity: 1;
 }
-/* 修复动画：从下到上平滑渐入，无突兀感 */
 .home-container{
   max-width:700px;
   margin:0 auto;
@@ -32,19 +30,17 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
   border:1px solid rgba(255,255,255,0.5);
   position:relative;
   z-index:1;
-  /* 修复动画初始状态 - 只保留动画属性，移除手动设置的初始值 */
   animation: fadeInUp 1s ease-out 0.3s forwards;
-  text-align: center; /* 新增：首页内容整体居中 */
+  text-align: center;
 }
-/* 定义渐入上移动画 */
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(20px); /* 初始在下方 */
+    transform: translateY(20px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0); /* 最终到原位 */
+    transform: translateY(0);
   }
 }
 .avatar{width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid rgba(212,209,240,0.8);box-shadow:0 0 15px rgba(212,209,240,0.6);margin:0 auto 1rem;background:#eeebf7;display:block;background:url(https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/260409touxiang.png) center/cover no-repeat}
@@ -53,12 +49,14 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .tag-english{font-size:1.3rem;font-weight:600;color:#433469;display:block}
 .tag-chinese{font-size:1rem;color:#433469;display:block}
 .section{background:rgba(255,255,255,0.4);border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.05);border:1px solid rgba(255,255,255,0.6);
-  text-align: center; /* 新增：首页section内容居中 */
+  text-align: center;
 }
 .section h2{font-size:1.2rem;margin-bottom:1rem}
 .live-info{line-height:1.8;font-size:0.95rem;
-  text-align: center; /* 新增：直播信息文本居中 */
+  text-align: center;
 }
+/* 修改：取消加粗，仅保留更大字体 */
+.live-title{font-size:1.1rem;font-weight:normal;color:#433469;margin-bottom:0.8rem;display:block;}
 .live-status{margin-top:1.2rem;font-weight:900;font-size:1.3rem;color:#e66786;letter-spacing:0.5px}
 .links{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1rem}
 .btn{padding:0.7rem 1.4rem;border-radius:30px;background:rgba(212,209,240,0.7);color:#433469;text-decoration:none;font-weight:bold;transition:all 0.2s;box-shadow:0 2px 8px rgba(212,209,240,0.1);border:1px solid rgba(255,255,255,0.7)}
@@ -86,21 +84,37 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .gift-btn:hover{background:#433469;color:#fff}
 .gift-img-container{width:100%;overflow:auto;margin-top:1rem;border-radius:8px;border:1px solid #d4d1f0;display:none}
 .gift-img{width:100%;height:auto;display:block}
-/* 二维码弹窗真正居中优化（仅保留这个居中） */
+
+/* 资源下载按钮修改：无装饰纯文字样式 */
+.resource-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;text-align:center;}
+.resource-table{width:100%;border-collapse:collapse;margin-top:1rem;}
+.resource-table th,.resource-table td{padding:1rem;border-bottom:1px solid #d4d1f0;color:#433469;text-align:center;}
+.resource-table th{font-weight:bold;background:rgba(212,209,240,0.2)}
+.resource-table tr:hover{background:rgba(212,209,240,0.1)}
+/* 纯文字下载按钮，无任何外装饰 */
+.download-btn{color:#433469;font-weight:bold;text-decoration:none;transition:0.2s;font-size:1rem;}
+.download-btn:hover{color:#e66786;}
+
 .qrcode-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;opacity:0;pointer-events:none;transition:0.3s}
 .qrcode-modal.show{opacity:1;pointer-events:all}
-.qrcode-content{background:#fff;padding:2rem;border-radius:16px;max-width:90%;width:350px;/* 固定宽度更美观 */
+.qrcode-content{background:#fff;padding:2rem;border-radius:16px;max-width:90%;width:350px;
   position:absolute;
   top:50%;
   left:50%;
-  transform:translate(-50%, -50%);/* 真正的绝对居中 */
+  transform:translate(-50%, -50%);
+  text-align: center;
 }
-.qrcode-img{max-width:300px;height:auto;border-radius:8px;margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;/* 图片居中 */}
+.qrcode-img{max-width:300px;height:auto;border-radius:8px;margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;}
+.qrcode-text{
+  color:#433469;
+  margin-bottom:1rem;
+  text-align: center;
+  width: 100%;
+}
 .close-qrcode{padding:0.7rem 1.5rem;background:#433469;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:1rem}
 
-/* 商务合作页面样式 - 新增内容居中 */
 .business-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;line-height:2;
-  text-align: center; /* 新增：商务合作内容整体居中 */
+  text-align: center;
 }
 .business-container h2{margin-bottom:2rem;color:#433469;font-size:1.5rem}
 .business-section{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #d4d1f0}
@@ -108,9 +122,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .business-section h3{color:#433469;margin-bottom:1rem;font-size:1.2rem}
 .business-section p{margin-bottom:0.5rem}
 
-/* 关于本站页面样式 - 简化排版，取消分段和标题 + 新增内容居中 */
 .about-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;line-height:2;
-  text-align: center; /* 新增：关于本站内容整体居中 */
+  text-align: center;
 }
 .about-container h2{margin-bottom:2rem;color:#433469;font-size:1.5rem}
 .about-container p{margin-bottom:1rem}
@@ -128,11 +141,9 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="sidebar-btn" id="navPlaylist">歌单</div>
 <a href="https://dreamail.cn/send?dm=b1c26b71-7cf6-4890-aeef-ce2d6d9d4dc0" class="sidebar-btn" target="_blank">提问箱</a>
 <div class="sidebar-btn" id="navGiftRecord">舰礼留档</div>
-<div class="sidebar-btn">资源下载</div>
-<!-- 调整直播间和主页顺序 -->
+<div class="sidebar-btn" id="navResource">资源下载</div>
 <a href="https://space.bilibili.com/90566661" class="sidebar-btn" target="_blank">Reii的主页</a>
 <a href="https://live.bilibili.com/1748139065" class="sidebar-btn" target="_blank">Reii的直播间</a>
-<!-- 分开商务合作和关于本站 -->
 <div class="sidebar-btn" id="navBusiness">商务合作</div>
 <div class="sidebar-btn" id="navAbout">关于本站</div>
 </div>
@@ -153,6 +164,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="section">
 <h2>直播信息</h2>
 <div class="live-info">
+<!-- 虚拟主播 月岛怜Reii -->
+<span class="live-title">虚拟主播 月岛怜Reii</span>
 直播平台：Bilibili<br>
 直播时间：20:00 午台随机掉落 周二定休<br>
 直播内容：杂谈 | 唱歌 | 偶尔打游戏<br>
@@ -169,7 +182,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </div>
 </div>
 
-<!-- 歌单内容 - 恢复完整的表头和内容 -->
+<!-- 歌单内容 -->
 <div class="playlist-container" id="playlistContent">
 <div class="search-bar">
 <input type="text" class="search-input" id="songSearch" placeholder="搜索歌曲/歌手">
@@ -249,6 +262,30 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
   </div>
 </div>
 
+<!-- 资源下载页面 -->
+<div class="resource-container" id="resourceContent">
+  <h2 style="margin-bottom:2rem;color:#433469;font-size:1.5rem">资源下载</h2>
+  <div class="search-bar">
+    <input type="text" class="search-input" id="resourceSearch" placeholder="搜索资源名称">
+  </div>
+  <div class="no-result" id="resourceNoResult">暂无匹配资源</div>
+  <table class="resource-table">
+    <thead>
+      <tr>
+        <th>资源名称</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="resourceTableBody">
+      <tr>
+        <td>月岛怜Reii房间专属表情</td>
+        <!-- 已修正为你提供的完整下载地址，纯文字下载 -->
+        <td><a href="https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/月岛怜Reii房间专属表情.zip" class="download-btn" download>下载</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <!-- 商务合作页面 -->
 <div class="business-container" id="businessContent">
   <h2>商务合作</h2>
@@ -266,7 +303,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
   </div>
 </div>
 
-<!-- 关于本站页面 - 简化排版，取消分段和自定义标题 -->
+<!-- 关于本站页面 -->
 <div class="about-container" id="aboutContent">
   <h2>关于本站</h2>
   
@@ -281,7 +318,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="qrcode-modal" id="qrcodeModal">
   <div class="qrcode-content">
     <img src="" class="qrcode-img" id="qrcodeImg">
-    <p style="color:#433469;margin-bottom:1rem">扫码填写舰礼登记信息</p>
+    <p class="qrcode-text">扫码填写舰礼登记信息</p>
     <button class="close-qrcode" onclick="hideQrcode()">关闭</button>
   </div>
 </div>
@@ -306,26 +343,27 @@ document.getElementById("overlay").addEventListener("click", () => {
   overlay.classList.remove("show");
 });
 
-// 页面切换 - 修复动画触发逻辑
+// 页面切换
 function show(page) {
-  // 隐藏所有页面
   document.getElementById("homeContent").classList.add("hidden");
   document.getElementById("playlistContent").classList.remove("show");
   document.getElementById("giftRecordContent").classList.remove("show");
+  document.getElementById("resourceContent").classList.remove("show");
   document.getElementById("businessContent").classList.remove("show");
   document.getElementById("aboutContent").classList.remove("show");
   
   if (page === "home") {
     document.getElementById("homeContent").classList.remove("hidden");
-    // 修复动画：重新触发时先重置动画状态
     const homeContainer = document.getElementById("homeContent");
     homeContainer.style.animation = 'none';
-    homeContainer.offsetHeight; // 强制重绘
+    homeContainer.offsetHeight;
     homeContainer.style.animation = 'fadeInUp 1s ease-out 0.3s forwards';
   } else if (page === "music") {
     document.getElementById("playlistContent").classList.add("show");
   } else if (page === "gift") {
     document.getElementById("giftRecordContent").classList.add("show");
+  } else if (page === "resource") {
+    document.getElementById("resourceContent").classList.add("show");
   } else if (page === "business") {
     document.getElementById("businessContent").classList.add("show");
   } else if (page === "about") {
@@ -336,10 +374,11 @@ function show(page) {
   document.getElementById("overlay").classList.remove("show");
 }
 
-// 绑定导航点击事件
+// 绑定导航
 document.getElementById("navHome").addEventListener("click", () => show("home"));
 document.getElementById("navPlaylist").addEventListener("click", () => show("music"));
 document.getElementById("navGiftRecord").addEventListener("click", () => show("gift"));
+document.getElementById("navResource").addEventListener("click", () => show("resource"));
 document.getElementById("navBusiness").addEventListener("click", () => show("business"));
 document.getElementById("navAbout").addEventListener("click", () => show("about"));
 
@@ -354,6 +393,25 @@ document.getElementById("songSearch").addEventListener("input", () => {
     const song = row.cells[0].textContent.toLowerCase();
     const singer = row.cells[1].textContent.toLowerCase();
     if (song.includes(searchValue) || singer.includes(searchValue)) {
+      row.style.display = "";
+      hasMatch = true;
+    } else {
+      row.style.display = "none";
+    }
+  });
+  noResult.style.display = hasMatch ? "none" : "block";
+});
+
+// 资源搜索
+document.getElementById("resourceSearch").addEventListener("input", () => {
+  const searchValue = document.getElementById("resourceSearch").value.toLowerCase().trim();
+  const rows = document.getElementById("resourceTableBody").querySelectorAll("tr");
+  const noResult = document.getElementById("resourceNoResult");
+  let hasMatch = false;
+  
+  rows.forEach(row => {
+    const resourceName = row.cells[0].textContent.toLowerCase();
+    if (resourceName.includes(searchValue)) {
       row.style.display = "";
       hasMatch = true;
     } else {
@@ -400,7 +458,7 @@ async function checkLiveStatus() {
   }
 }
 
-// 舰礼留档 - 折叠/展开功能
+// 舰礼留档
 function toggleGiftItem(id) {
   const content = document.getElementById(`${id}Content`);
   const toggleBtn = document.getElementById(`${id}Toggle`);
@@ -416,7 +474,6 @@ function toggleGiftItem(id) {
   }
 }
 
-// 展示/隐藏活动长图
 function toggleGiftImg(id) {
   const imgContainer = document.getElementById(id);
   if (imgContainer.style.display === "block") {
@@ -427,7 +484,7 @@ function toggleGiftImg(id) {
   }
 }
 
-// 显示二维码弹窗
+// 二维码
 function showQrcode(type) {
   const modal = document.getElementById("qrcodeModal");
   const qrcodeImg = document.getElementById("qrcodeImg");
@@ -441,7 +498,6 @@ function showQrcode(type) {
   modal.classList.add("show");
 }
 
-// 隐藏二维码弹窗
 function hideQrcode() {
   const modal = document.getElementById("qrcodeModal");
   modal.classList.remove("show");
