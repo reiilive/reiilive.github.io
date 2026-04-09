@@ -20,30 +20,92 @@
             background-attachment: fixed;
             background-size: cover;
             background-color: #f0ebf8;
-            background-blend-mode: normal;
             color: #433469;
             min-height: 100vh;
-            padding: 2rem 1rem;
             position: relative;
-            z-index: 0;
+            overflow-x: hidden;
         }
 
-        body::before {
-            content: "";
+        /* 侧边栏核心样式 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transition: 0.3s ease;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: #433469;
+            text-align: center;
+        }
+        .sidebar-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(212,209,240,0.5);
+            border-radius: 12px;
+            text-align: center;
+            color: #433469;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .sidebar-btn:hover {
+            background: #433469;
+            color: #fff;
+        }
+
+        /* 打开按钮 */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 998;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 遮罩 */
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url("https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/beijing.png");
-            background-position: center;
-            background-size: cover;
-            opacity: 1;
-            z-index: -1;
+            background: rgba(0,0,0,0.3);
+            z-index: 888;
+            opacity: 0;
             pointer-events: none;
-            cache-control: no-cache;
+            transition: 0.3s;
+        }
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
         }
 
+        /* 原有内容样式 */
         .container {
             max-width: 700px;
             margin: 0 auto;
@@ -56,6 +118,7 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             position: relative;
             z-index: 1;
+            margin-top: 3rem;
         }
 
         .avatar {
@@ -64,15 +127,11 @@
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid rgba(212, 209, 240, 0.8);
-            box-shadow: 0 0 15px rgba(212, 209, 240, 0.6), 0 8px 24px rgba(212, 209, 240, 0.15);
+            box-shadow: 0 0 15px rgba(212, 209, 240, 0.6);
             margin: 0 auto 1rem;
             content: url("https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/260409touxiang.png");
             background: #eeebf7;
             display: block;
-            align-items: center;
-            justify-content: center;
-            color: #433469;
-            font-weight: bold;
         }
 
         .name {
@@ -87,16 +146,12 @@
             text-shadow: 0 1px 1px rgba(255,255,255,0.6);
             line-height: 1.8;
         }
-
-        /* 英文名字样式 */
         .tag-english {
             font-size: 1.3rem;
             font-weight: 600;
             color: #433469;
             display: block;
         }
-
-        /* 中文标签样式 */
         .tag-chinese {
             font-size: 1rem;
             color: #433469;
@@ -109,32 +164,22 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            text-align: left;
+            text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
-
         .section h2 {
             font-size: 1.2rem;
-            color: #433469;
             margin-bottom: 1rem;
-            text-align: center;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
         }
-
         .live-info {
-            text-align: center;
             line-height: 1.8;
             font-size: 0.95rem;
-            color: #433469;
-            text-shadow: 0 0.5px 1px rgba(255,255,255,0.5);
         }
-
         .live-status {
             margin-top: 1.2rem;
             font-weight: 900;
             font-size: 1.3rem;
             color: #e66786;
-            text-shadow: 0 1px 3px rgba(255,255,255,0.8);
             letter-spacing: 0.5px;
         }
 
@@ -145,7 +190,6 @@
             justify-content: center;
             margin-top: 1rem;
         }
-
         .btn {
             padding: 0.7rem 1.4rem;
             border-radius: 30px;
@@ -157,7 +201,6 @@
             box-shadow: 0 2px 8px rgba(212, 209, 240, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.7);
         }
-
         .btn:hover {
             background: #433469;
             color: #d4d1f0;
@@ -167,47 +210,41 @@
         }
 
         .footer {
-            margin-top: 3rem;
+            margin-top: 2rem;
             font-size: 0.8rem;
             color: #433469;
-            text-shadow: 0 0.5px 1px rgba(255,255,255,0.6);
-        }
-
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem 1rem;
-                margin: 0 0.5rem;
-                backdrop-filter: blur(1px);
-                background: rgba(255, 255, 255, 0.35);
-            }
-            .avatar {
-                width: 120px;
-                height: 120px;
-                margin: 0 auto 1rem;
-                box-shadow: 0 0 10px rgba(212, 209, 240, 0.6), 0 6px 18px rgba(212, 209, 240, 0.15);
-            }
-            .name {
-                font-size: 1.8rem;
-                margin-bottom: 0.1rem;
-            }
-            .tag-english {
-                font-size: 1.15rem;
-            }
-            .section {
-                background: rgba(255, 255, 255, 0.45);
-            }
-            .live-status {
-                font-size: 1.15rem;
-                margin-top: 1rem;
-            }
+            text-align: center;
+            padding-bottom: 2rem;
         }
     </style>
 </head>
 
 <body>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-title">导航菜单</div>
+        <a href="https://reii.live" class="sidebar-btn" target="_blank">首页</a>
+        <a href="#" class="sidebar-btn">歌单</a>
+        <a href="#" class="sidebar-btn">棉花糖</a>
+        <a href="#" class="sidebar-btn">舰礼留档</a>
+        <a href="#" class="sidebar-btn">资源下载</a>
+        <a href="#" class="sidebar-btn">关于Reii</a>
+        <a href="https://live.bilibili.com/1748139065" class="sidebar-btn" target="_blank">Reii的直播间</a>
+        <a href="https://space.bilibili.com/90566661" class="sidebar-btn" target="_blank">Reii的主页</a>
+        <a href="#" class="sidebar-btn">留言板</a>
+        <a href="#" class="sidebar-btn">合作联系</a>
+    </div>
+
+    <!-- 打开按钮 -->
+    <div class="menu-toggle" id="menuToggle">☰</div>
+
+    <!-- 遮罩 -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主体内容 -->
     <div class="container">
-        <div class="avatar" alt="月岛怜"></div>
+        <div class="avatar"></div>
         <h1 class="name">月岛怜</h1>
         <div class="tag">
             <span class="tag-english">Tsukishima Rei</span>
@@ -229,78 +266,70 @@
             <div class="links">
                 <a href="https://space.bilibili.com/90566661" class="btn" target="_blank">B站主页</a>
                 <a href="https://live.bilibili.com/1748139065" class="btn" target="_blank">直播间</a>
-                <a href="#" class="btn">稿件合集</a>
-                <a href="#" class="btn">关于我</a>
             </div>
-        </div>
-
-        <div class="footer">
-            © 2026 月岛怜Reii | reii.live
         </div>
     </div>
 
+    <div class="footer">
+        © 2026 月岛怜Reii | reii.live
+    </div>
+
     <script>
+        // 侧边栏开关
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const toggle = document.getElementById('menuToggle');
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        // 直播状态
         const roomId = 1748139065;
         const refreshInterval = 30000;
 
-        // 开播时长：时:分:秒
         function calculateLiveDuration(startTime) {
             const now = Date.now();
             const diff = now - startTime * 1000;
             if (diff < 0) return "00:00:00";
-
             const hours = Math.floor(diff / 3600000);
             const minutes = Math.floor((diff % 3600000) / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
-
-            const padZero = (num) => num.toString().padStart(2, '0');
-            const timeStr = `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
-            return `已开播${timeStr}`;
+            const padZero = num => num.toString().padStart(2, '0');
+            return `已开播${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         }
 
-        // 检测直播状态
         async function getLiveStatus() {
             try {
-                const response = await fetch(`https://api.live.bilibili.com/room/v1/Room/get_info?room_id=${roomId}&no_cache=${Date.now()}`);
-                const data = await response.json();
-
-                const statusElement = document.getElementById('liveStatus');
-                
-                if (data.code === 0) {
-                    const roomInfo = data.data;
-                    if (roomInfo.live_status === 1) {
-                        const duration = calculateLiveDuration(roomInfo.live_start_time);
-                        statusElement.textContent = duration;
-                        statusElement.style.color = "#e66786";
-                    } else if (roomInfo.live_status === 2) {
-                        statusElement.textContent = "轮播中";
-                        statusElement.style.color = "#9d79d6";
+                const res = await fetch(`https://api.live.bilibili.com/room/v1/Room/get_info?room_id=${roomId}&no_cache=${Date.now()}`);
+                const data = await res.json();
+                const el = document.getElementById('liveStatus');
+                if(data.code === 0){
+                    if(data.data.live_status === 1){
+                        el.textContent = calculateLiveDuration(data.data.live_start_time);
+                        el.style.color = "#e66786";
+                    } else if(data.data.live_status === 2){
+                        el.textContent = "轮播中";
+                        el.style.color = "#9d79d6";
                     } else {
-                        statusElement.textContent = "未开播";
-                        statusElement.style.color = "#433469";
+                        el.textContent = "未开播";
+                        el.style.color = "#433469";
                     }
-                } else {
-                    statusElement.textContent = "状态检测失败";
-                    statusElement.style.color = "#433469";
                 }
-            } catch (error) {
-                console.error("获取直播间状态失败：", error);
-                const statusElement = document.getElementById('liveStatus');
-                statusElement.textContent = "状态检测失败";
-                statusElement.style.color = "#433469";
+            } catch(e){
+                document.getElementById('liveStatus').textContent = "状态检测失败";
             }
         }
 
-        window.onload = function() {
+        window.onload = () => {
             getLiveStatus();
             setInterval(getLiveStatus, refreshInterval);
         };
-
-        window.addEventListener('error', (e) => {
-            if (e.target.classList.contains('avatar')) {
-                e.target.textContent = "头像加载中";
-            }
-        }, true);
     </script>
 </body>
 </html>
