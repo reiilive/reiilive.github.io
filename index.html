@@ -232,15 +232,13 @@
             display: none; /* 默认隐藏 */
         }
 
+        /* 搜索框样式（移除下拉框，加宽搜索框） */
         .search-bar {
-            display: flex;
-            gap: 1rem;
             margin-bottom: 2rem;
-            align-items: center;
         }
 
         .search-input {
-            flex: 1;
+            width: 100%;
             padding: 0.8rem 1.2rem;
             border-radius: 8px;
             border: 1px solid #d4d1f0;
@@ -248,17 +246,6 @@
             color: #433469;
             font-size: 1rem;
             outline: none;
-        }
-
-        .style-select {
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            border: 1px solid #d4d1f0;
-            background: rgba(255,255,255,0.9);
-            color: #433469;
-            font-size: 1rem;
-            outline: none;
-            cursor: pointer;
         }
 
         .song-table {
@@ -283,6 +270,14 @@
             background: rgba(212,209,240,0.1);
         }
 
+        /* 无结果提示 */
+        .no-result {
+            text-align: center;
+            padding: 2rem;
+            color: #433469;
+            display: none;
+        }
+
         .footer {
             margin-top: 2rem;
             font-size: 0.8rem;
@@ -291,11 +286,11 @@
             padding-bottom: 2rem;
         }
 
-        /* 显示/隐藏类（修复核心问题） */
+        /* 隐藏元素通用类 */
         .hidden {
             display: none !important;
         }
-        .active-content {
+        .show {
             display: block !important;
         }
     </style>
@@ -356,25 +351,22 @@
         <!-- 歌单内容 -->
         <div class="playlist-container" id="playlistContent">
             <div class="search-bar">
-                <input type="text" class="search-input" placeholder="搜索歌曲名称或歌手">
-                <select class="style-select">
-                    <option>选择风格</option>
-                    <option>流行</option>
-                    <option>抒情</option>
-                    <option>英文</option>
-                    <option>中文</option>
-                </select>
+                <!-- 移除风格下拉框，仅保留搜索框 -->
+                <input type="text" class="search-input" id="songSearch" placeholder="搜索歌曲名称或歌手（支持模糊匹配）">
             </div>
 
-            <table class="song-table">
+            <!-- 无结果提示 -->
+            <div class="no-result" id="noResult">暂无匹配的歌曲～</div>
+
+            <table class="song-table" id="songTable">
                 <thead>
                     <tr>
                         <th>歌曲名称</th>
                         <th>歌手</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- 前三首核心歌曲 -->
+                <tbody id="songTableBody">
+                    <!-- 完整歌单 -->
                     <tr>
                         <td>A.I.N.Y.</td>
                         <td>G.E.M. 邓紫棋</td>
@@ -386,6 +378,62 @@
                     <tr>
                         <td>Always Online</td>
                         <td>林俊杰</td>
+                    </tr>
+                    <tr>
+                        <td>APT.</td>
+                        <td>ROSé / Bruno Mars</td>
+                    </tr>
+                    <tr>
+                        <td>Call Me Maybe</td>
+                        <td>Carly Rae Jepsen</td>
+                    </tr>
+                    <tr>
+                        <td>Cure For Me</td>
+                        <td>AURORA</td>
+                    </tr>
+                    <tr>
+                        <td>Darling</td>
+                        <td>西野加奈</td>
+                    </tr>
+                    <tr>
+                        <td>Ditto</td>
+                        <td>NewJeans</td>
+                    </tr>
+                    <tr>
+                        <td>Dream It Possible</td>
+                        <td>Delacey</td>
+                    </tr>
+                    <tr>
+                        <td>East of Eden</td>
+                        <td>Zella Day</td>
+                    </tr>
+                    <tr>
+                        <td>Five Hundred Miles</td>
+                        <td>Justin Timberlake / Carey Mulligan / Stark Sands</td>
+                    </tr>
+                    <tr>
+                        <td>God Is A Girl</td>
+                        <td>Groove Coverage</td>
+                    </tr>
+                    <tr>
+                        <td>Gone</td>
+                        <td>ROSé</td>
+                    </tr>
+                    <tr>
+                        <td>I Love You 3000</td>
+                        <td>Stephanie Poetri</td>
+                    </tr>
+                    <tr>
+                        <td>Jar Of Love</td>
+                        <td>曲婉婷</td>
+                    </tr>
+                    <tr>
+                        <td>Letting Go</td>
+                        <td>蔡健雅</td>
+                    </tr>
+                    <tr>
+                        <td>Love Love Love</td>
+                        <td>蔡依林</td>
                     </tr>
                 </tbody>
             </table>
@@ -411,74 +459,126 @@
             overlay.classList.remove('show');
         });
 
-        // 核心修复：内容切换逻辑
+        // 内容切换逻辑
         const homeContent = document.getElementById('homeContent');
         const playlistContent = document.getElementById('playlistContent');
         const navHome = document.getElementById('navHome');
         const navPlaylist = document.getElementById('navPlaylist');
 
-        // 初始化：默认显示首页
-        homeContent.classList.remove('hidden');
-        playlistContent.classList.remove('active-content');
-        navHome.classList.add('active');
-        navPlaylist.classList.remove('active');
+        // 解析URL参数，处理404重定向后的路由
+        function getUrlParam(name) {
+            const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`);
+            const r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURIComponent(r[2]);
+            return null;
+        }
 
-        // 处理Hash路由（适配GitHub Pages 404重定向）
-        function handleHashRoute() {
-            const hash = window.location.hash;
-            if (hash === '#!/music' || hash === '#!/music/') {
-                showPlaylist();
+        // 核心：检测路由并显示对应内容（支持/music路径）
+        function checkRouteAndShowContent() {
+            // 情况1：直接访问/music（GitHub Pages先404，再重定向到/?route=/music）
+            const routeParam = getUrlParam('route');
+            // 情况2：通过侧边栏点击的/music路径
+            const pathname = window.location.pathname;
+
+            if (routeParam === '/music' || pathname === '/music') {
+                // 显示歌单 + 更新URL为纯/music（去掉参数）
+                history.replaceState({}, '', '/music');
+                homeContent.classList.add('hidden');
+                playlistContent.classList.add('show');
+                navHome.classList.remove('active');
+                navPlaylist.classList.add('active');
             } else {
-                showHome();
+                // 显示首页
+                homeContent.classList.remove('hidden');
+                playlistContent.classList.remove('show');
+                navHome.classList.add('active');
+                navPlaylist.classList.remove('active');
             }
         }
 
-        // 显示首页
-        function showHome() {
-            homeContent.classList.remove('hidden');
-            playlistContent.classList.remove('active-content');
-            navHome.classList.add('active');
-            navPlaylist.classList.remove('active');
-            // 更新URL（可选）
-            window.history.pushState({}, '', '/');
-        }
-
-        // 显示歌单（核心修复：改用active-content类）
-        function showPlaylist() {
-            homeContent.classList.add('hidden');
-            playlistContent.classList.add('active-content');
-            navHome.classList.remove('active');
-            navPlaylist.classList.add('active');
-            // 更新URL（适配GitHub Pages）
-            window.history.pushState({}, '', '/#!/music');
-        }
-
-        // 侧边栏点击事件（修复不生效问题）
+        // 侧边栏点击切换（URL显示为纯/music）
         navHome.addEventListener('click', () => {
-            showHome();
+            // 切换到首页，URL显示为https://reii.live/
+            history.pushState({}, '', '/');
+            checkRouteAndShowContent();
             sidebar.classList.remove('open');
             overlay.classList.remove('show');
         });
 
         navPlaylist.addEventListener('click', () => {
-            showPlaylist();
+            // 切换到歌单，URL显示为https://reii.live/music
+            history.pushState({}, '', '/music');
+            checkRouteAndShowContent();
             sidebar.classList.remove('open');
             overlay.classList.remove('show');
         });
 
-        // 页面加载+Hash变化时触发路由
+        // ========== 搜索功能核心逻辑 ==========
+        const searchInput = document.getElementById('songSearch');
+        const songTableBody = document.getElementById('songTableBody');
+        const noResult = document.getElementById('noResult');
+        const originalSongs = [];
+
+        // 初始化原始歌单数据
+        function initOriginalSongs() {
+            const rows = songTableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const songName = row.cells[0].textContent.trim();
+                const singer = row.cells[1].textContent.trim();
+                originalSongs.push({
+                    songName,
+                    singer,
+                    element: row
+                });
+            });
+        }
+
+        // 搜索函数：模糊匹配歌曲名/歌手名
+        function searchSongs(keyword) {
+            songTableBody.innerHTML = '';
+            noResult.style.display = 'none';
+            
+            if (!keyword) {
+                originalSongs.forEach(song => {
+                    songTableBody.appendChild(song.element);
+                });
+                return;
+            }
+
+            const lowerKeyword = keyword.toLowerCase();
+            const matchedSongs = originalSongs.filter(song => {
+                return song.songName.toLowerCase().includes(lowerKeyword) 
+                    || song.singer.toLowerCase().includes(lowerKeyword);
+            });
+
+            if (matchedSongs.length === 0) {
+                noResult.style.display = 'block';
+            } else {
+                matchedSongs.forEach(song => {
+                    songTableBody.appendChild(song.element);
+                });
+            }
+        }
+
+        // 绑定搜索事件
+        searchInput.addEventListener('input', (e) => {
+            searchSongs(e.target.value.trim());
+        });
+
+        // 页面加载初始化
         window.onload = () => {
-            handleHashRoute();
+            initOriginalSongs();
+            checkRouteAndShowContent(); // 优先处理路由
             // 直播状态检测
             getLiveStatus();
             setInterval(getLiveStatus, 30000);
         };
-        window.onhashchange = handleHashRoute;
+
+        // 监听浏览器前进/后退
+        window.onpopstate = checkRouteAndShowContent;
 
         // 直播状态逻辑
         const roomId = 1748139065;
-        const refreshInterval = 30000;
-
         function calculateLiveDuration(startTime) {
             const now = Date.now();
             const diff = now - startTime * 1000;
