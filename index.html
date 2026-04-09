@@ -63,8 +63,13 @@
             text-decoration: none;
             font-weight: bold;
             transition: 0.2s;
+            cursor: pointer;
         }
         .sidebar-btn:hover {
+            background: #433469;
+            color: #fff;
+        }
+        .sidebar-btn.active {
             background: #433469;
             color: #fff;
         }
@@ -105,8 +110,16 @@
             pointer-events: all;
         }
 
-        /* 原有内容样式 */
-        .container {
+        /* 内容容器通用样式 */
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* 首页内容样式 */
+        .home-container {
             max-width: 700px;
             margin: 0 auto;
             text-align: center;
@@ -118,7 +131,6 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             position: relative;
             z-index: 1;
-            margin-top: 3rem;
         }
 
         .avatar {
@@ -209,6 +221,68 @@
             border: 1px solid #433469;
         }
 
+        /* 歌单页面核心样式 */
+        .playlist-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: none; /* 默认隐藏 */
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #d4d1f0;
+            background: rgba(255,255,255,0.9);
+            color: #433469;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .style-select {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #d4d1f0;
+            background: rgba(255,255,255,0.9);
+            color: #433469;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .song-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .song-table th,
+        .song-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #d4d1f0;
+            color: #433469;
+        }
+
+        .song-table th {
+            font-weight: bold;
+            background: rgba(212,209,240,0.2);
+        }
+
+        .song-table tr:hover {
+            background: rgba(212,209,240,0.1);
+        }
+
         .footer {
             margin-top: 2rem;
             font-size: 0.8rem;
@@ -216,24 +290,31 @@
             text-align: center;
             padding-bottom: 2rem;
         }
+
+        /* 隐藏元素通用类 */
+        .hidden {
+            display: none !important;
+        }
+        .show {
+            display: block !important;
+        }
     </style>
 </head>
 
 <body>
-
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-title">导航菜单</div>
-        <a href="https://reii.live" class="sidebar-btn" target="_blank">首页</a>
-        <a href="#" class="sidebar-btn">歌单</a>
-        <a href="#" class="sidebar-btn">棉花糖</a>
-        <a href="#" class="sidebar-btn">舰礼留档</a>
-        <a href="#" class="sidebar-btn">资源下载</a>
-        <a href="#" class="sidebar-btn">关于Reii</a>
+        <div class="sidebar-btn" id="navHome">首页</div>
+        <div class="sidebar-btn" id="navPlaylist">歌单</div>
+        <div class="sidebar-btn">棉花糖</div>
+        <div class="sidebar-btn">舰礼留档</div>
+        <div class="sidebar-btn">资源下载</div>
+        <div class="sidebar-btn">关于Reii</div>
         <a href="https://live.bilibili.com/1748139065" class="sidebar-btn" target="_blank">Reii的直播间</a>
         <a href="https://space.bilibili.com/90566661" class="sidebar-btn" target="_blank">Reii的主页</a>
-        <a href="#" class="sidebar-btn">留言板</a>
-        <a href="#" class="sidebar-btn">合作联系</a>
+        <div class="sidebar-btn">留言板</div>
+        <div class="sidebar-btn">合作联系</div>
     </div>
 
     <!-- 打开按钮 -->
@@ -242,31 +323,128 @@
     <!-- 遮罩 -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- 主体内容 -->
-    <div class="container">
-        <div class="avatar"></div>
-        <h1 class="name">月岛怜</h1>
-        <div class="tag">
-            <span class="tag-english">Tsukishima Rei</span>
-            <span class="tag-chinese">海上红茶馆Mirage的打工猫，不是笨蛋> <</span>
-        </div>
+    <!-- 内容容器 -->
+    <div class="content-wrapper">
+        <!-- 首页内容 -->
+        <div class="home-container" id="homeContent">
+            <div class="avatar"></div>
+            <h1 class="name">月岛怜</h1>
+            <div class="tag">
+                <span class="tag-english">Tsukishima Rei</span>
+                <span class="tag-chinese">海上红茶馆Mirage的打工猫，不是笨蛋> <</span>
+            </div>
 
-        <div class="section">
-            <h2>🎤 直播信息</h2>
-            <div class="live-info">
-                直播平台：Bilibili<br>
-                直播时间：20:00 午台随机掉落 周二定休<br>
-                直播内容：杂谈 | 唱歌 | 偶尔打游戏<br>
-                <div class="live-status" id="liveStatus">正在检测直播间状态...</div>
+            <div class="section">
+                <h2>🎤 直播信息</h2>
+                <div class="live-info">
+                    直播平台：Bilibili<br>
+                    直播时间：20:00 午台随机掉落 周二定休<br>
+                    直播内容：杂谈 | 唱歌 | 偶尔打游戏<br>
+                    <div class="live-status" id="liveStatus">正在检测直播间状态...</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔗 快速前往</h2>
+                <div class="links">
+                    <a href="https://space.bilibili.com/90566661" class="btn" target="_blank">B站主页</a>
+                    <a href="https://live.bilibili.com/1748139065" class="btn" target="_blank">直播间</a>
+                </div>
             </div>
         </div>
 
-        <div class="section">
-            <h2>🔗 快速前往</h2>
-            <div class="links">
-                <a href="https://space.bilibili.com/90566661" class="btn" target="_blank">B站主页</a>
-                <a href="https://live.bilibili.com/1748139065" class="btn" target="_blank">直播间</a>
+        <!-- 歌单内容 -->
+        <div class="playlist-container" id="playlistContent">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索歌曲名称或歌手">
+                <select class="style-select">
+                    <option>选择风格</option>
+                    <option>流行</option>
+                    <option>抒情</option>
+                    <option>英文</option>
+                    <option>中文</option>
+                </select>
             </div>
+
+            <table class="song-table">
+                <thead>
+                    <tr>
+                        <th>歌曲名称</th>
+                        <th>歌手</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 完整歌单（按图片添加） -->
+                    <tr>
+                        <td>A.I.N.Y.</td>
+                        <td>G.E.M. 邓紫棋</td>
+                    </tr>
+                    <tr>
+                        <td>All of Me</td>
+                        <td>John Legend</td>
+                    </tr>
+                    <tr>
+                        <td>Always Online</td>
+                        <td>林俊杰</td>
+                    </tr>
+                    <tr>
+                        <td>APT.</td>
+                        <td>ROSé / Bruno Mars</td>
+                    </tr>
+                    <tr>
+                        <td>Call Me Maybe</td>
+                        <td>Carly Rae Jepsen</td>
+                    </tr>
+                    <tr>
+                        <td>Cure For Me</td>
+                        <td>AURORA</td>
+                    </tr>
+                    <tr>
+                        <td>Darling</td>
+                        <td>西野加奈</td>
+                    </tr>
+                    <tr>
+                        <td>Ditto</td>
+                        <td>NewJeans</td>
+                    </tr>
+                    <tr>
+                        <td>Dream It Possible</td>
+                        <td>Delacey</td>
+                    </tr>
+                    <tr>
+                        <td>East of Eden</td>
+                        <td>Zella Day</td>
+                    </tr>
+                    <tr>
+                        <td>Five Hundred Miles</td>
+                        <td>Justin Timberlake / Carey Mulligan / Stark Sands</td>
+                    </tr>
+                    <tr>
+                        <td>God Is A Girl</td>
+                        <td>Groove Coverage</td>
+                    </tr>
+                    <tr>
+                        <td>Gone</td>
+                        <td>ROSé</td>
+                    </tr>
+                    <tr>
+                        <td>I Love You 3000</td>
+                        <td>Stephanie Poetri</td>
+                    </tr>
+                    <tr>
+                        <td>Jar Of Love</td>
+                        <td>曲婉婷</td>
+                    </tr>
+                    <tr>
+                        <td>Letting Go</td>
+                        <td>蔡健雅</td>
+                    </tr>
+                    <tr>
+                        <td>Love Love Love</td>
+                        <td>蔡依林</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -289,7 +467,57 @@
             overlay.classList.remove('show');
         });
 
-        // 直播状态
+        // 内容切换逻辑
+        const homeContent = document.getElementById('homeContent');
+        const playlistContent = document.getElementById('playlistContent');
+        const navHome = document.getElementById('navHome');
+        const navPlaylist = document.getElementById('navPlaylist');
+
+        // 检测URL路径，自动显示对应内容
+        function checkPathAndShowContent() {
+            const path = window.location.pathname;
+            if (path === '/music' || path === '/music/') {
+                // 显示歌单
+                homeContent.classList.add('hidden');
+                playlistContent.classList.add('show');
+                navHome.classList.remove('active');
+                navPlaylist.classList.add('active');
+            } else {
+                // 显示首页
+                homeContent.classList.remove('hidden');
+                playlistContent.classList.remove('show');
+                navHome.classList.add('active');
+                navPlaylist.classList.remove('active');
+            }
+        }
+
+        // 侧边栏点击切换
+        navHome.addEventListener('click', () => {
+            window.history.pushState({}, '', '/'); // 修改URL为首页
+            checkPathAndShowContent();
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        navPlaylist.addEventListener('click', () => {
+            window.history.pushState({}, '', '/music'); // 修改URL为/music
+            checkPathAndShowContent();
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        // 页面加载时检测路径
+        window.onload = () => {
+            checkPathAndShowContent();
+            // 直播状态检测
+            getLiveStatus();
+            setInterval(getLiveStatus, 30000);
+        };
+
+        // 监听浏览器前进/后退
+        window.onpopstate = checkPathAndShowContent;
+
+        // 直播状态逻辑
         const roomId = 1748139065;
         const refreshInterval = 30000;
 
@@ -325,11 +553,6 @@
                 document.getElementById('liveStatus').textContent = "状态检测失败";
             }
         }
-
-        window.onload = () => {
-            getLiveStatus();
-            setInterval(getLiveStatus, refreshInterval);
-        };
     </script>
 </body>
 </html>
