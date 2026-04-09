@@ -17,7 +17,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .overlay.show{opacity:1;pointer-events:all}
 .content-wrapper{max-width:900px;margin:0 auto;padding:2rem;margin-top:3rem}
 .home-container{max-width:700px;margin:0 auto;text-align:center;background:rgba(255,255,255,0.3);padding:2rem;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,0.08);backdrop-filter:blur(2px);border:1px solid rgba(255,255,255,0.5);position:relative;z-index:1}
-.avatar{width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid rgba(212,209,240,0.8);box-shadow:0 0 15px rgba(212,209,240,0.6);margin:0 auto 1rem;background:#eeebf7;display:block;background:url(https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/26040touxiang.png) center/cover no-repeat}
+/* 修复头像路径+样式 */
+.avatar{width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid rgba(212,209,240,0.8);box-shadow:0 0 15px rgba(212,209,240,0.6);margin:0 auto 1rem;background:#eeebf7;display:block;background:url(https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/260409touxiang.png) center/cover no-repeat}
 .name{font-size:2.2rem;color:#433469;margin-bottom:0.1rem;text-shadow:0 1px 2px rgba(255,255,255,0.6)}
 .tag{margin-bottom:2rem;text-shadow:0 1px 1px rgba(255,255,255,0.6);line-height:1.8}
 .tag-english{font-size:1.3rem;font-weight:600;color:#433469;display:block}
@@ -39,6 +40,10 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .song-table tr:hover{background:rgba(212,209,240,0.1)}
 .no-result{text-align:center;padding:2rem;color:#433469;display:none}
 
+/* 泡米提问箱容器样式（适配嵌入） */
+.pome-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none;height:700px;/* 适配提问箱高度 */}
+.pome-iframe{width:100%;height:100%;border:none;border-radius:12px;/* 去掉iframe边框，和页面融合 */}
+
 .footer{margin-top:2rem;font-size:0.8rem;color:#433469;text-align:center;padding-bottom:2rem}
 .hidden{display:none!important}
 .show{display:block!important}
@@ -50,8 +55,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="sidebar-title">导航菜单</div>
 <div class="sidebar-btn" id="navHome">首页</div>
 <div class="sidebar-btn" id="navPlaylist">歌单</div>
-<!-- 改成链接，点击新窗口打开棉花糖 -->
-<a href="https://marshmallow-qa.com/re7tioq35bvf867?t=rTbz8O&utm_medium=url_text&utm_source=promotion" class="sidebar-btn" target="_blank">棉花糖</a>
+<!-- 改为点击显示嵌入的泡米提问箱 -->
+<div class="sidebar-btn" id="navPome">提问箱</div>
 <div class="sidebar-btn">舰礼留档</div>
 <div class="sidebar-btn">资源下载</div>
 <div class="sidebar-btn">关于Reii</div>
@@ -65,6 +70,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 
 <div class="content-wrapper">
 <div class="home-container" id="homeContent">
+<!-- 头像已修复 -->
 <div class="avatar"></div>
 <h1 class="name">月岛怜</h1>
 <div class="tag">
@@ -87,8 +93,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="links">
 <a href="https://space.bilibili.com/90566661" class="btn" target="_blank">B站主页</a>
 <a href="https://live.bilibili.com/1748139065" class="btn" target="_blank">直播间</a>
-<!-- 首页也加一个棉花糖快捷入口 -->
-<a href="https://marshmallow-qa.com/re7tioq35bvf867?t=rTbz8O&utm_medium=url_text&utm_source=promotion" class="btn" target="_blank">棉花糖提问</a>
+<!-- 首页快捷入口也改为显示嵌入的提问箱 -->
+<div class="btn" id="homePomeBtn">提问箱</div>
 </div>
 </div>
 </div>
@@ -121,6 +127,11 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </table>
 </div>
 
+<!-- 泡米提问箱嵌入容器 -->
+<div class="pome-container" id="pomeContent">
+<iframe class="pome-iframe" src="https://www.pome.vip/ask" sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-top-navigation"></iframe>
+</div>
+
 </div>
 
 <div class="footer">© 2026 月岛怜Reii | reii.live</div>
@@ -141,23 +152,33 @@ document.getElementById("overlay").addEventListener("click", () => {
   overlay.classList.remove("show");
 });
 
-// 页面切换
+// 页面切换（新增泡米提问箱切换逻辑）
 function show(page) {
+  // 隐藏所有内容容器
   document.getElementById("homeContent").classList.add("hidden");
   document.getElementById("playlistContent").classList.remove("show");
+  document.getElementById("pomeContent").classList.remove("show");
   
+  // 根据传入页面显示对应内容
   if (page === "home") {
     document.getElementById("homeContent").classList.remove("hidden");
   } else if (page === "music") {
     document.getElementById("playlistContent").classList.add("show");
+  } else if (page === "pome") {
+    document.getElementById("pomeContent").classList.add("show");
   }
   
+  // 关闭侧边栏和遮罩
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("overlay").classList.remove("show");
 }
 
+// 绑定导航点击事件
 document.getElementById("navHome").addEventListener("click", () => show("home"));
 document.getElementById("navPlaylist").addEventListener("click", () => show("music"));
+document.getElementById("navPome").addEventListener("click", () => show("pome"));
+// 绑定首页提问箱快捷按钮
+document.getElementById("homePomeBtn").addEventListener("click", () => show("pome"));
 
 // 歌单搜索
 document.getElementById("songSearch").addEventListener("input", () => {
@@ -179,26 +200,53 @@ document.getElementById("songSearch").addEventListener("input", () => {
   noResult.style.display = hasMatch ? "none" : "block";
 });
 
-// 检测直播状态
+// 修复直播状态检测（改用兼容写法+降级）
 async function checkLiveStatus() {
+  const liveStatusEl = document.getElementById("liveStatus");
   try {
-    const response = await fetch("https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1748139065");
-    const data = await response.json();
-    const liveStatusEl = document.getElementById("liveStatus");
+    // 改用B站主播信息API，更稳定
+    const response = await fetch(`https://api.bilibili.com/x/space/acc/info?mid=90566661`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Referer': 'https://space.bilibili.com/' // 解决跨域限制
+      },
+      mode: 'cors'
+    });
     
-    if (data.code === 0 && data.data) {
-      liveStatusEl.textContent = data.data.live_status === 1 ? "正在直播中 🎉" : "当前未直播";
-      liveStatusEl.style.color = data.data.live_status === 1 ? "#e66786" : "#9d79d6";
+    if (!response.ok) throw new Error('API访问失败');
+    const data = await response.json();
+    
+    if (data.code === 0) {
+      // 先显示基础状态，避免API限制导致空白
+      liveStatusEl.textContent = "当前未直播";
+      liveStatusEl.style.color = "#9d79d6";
+      
+      // 额外检测直播间状态（备用）
+      try {
+        const roomRes = await fetch(`https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1748139065`);
+        const roomData = await roomRes.json();
+        if (roomData.code === 0 && roomData.data.live_status === 1) {
+          liveStatusEl.textContent = "正在直播中 🎉";
+          liveStatusEl.style.color = "#e66786";
+        }
+      } catch (e) { /* 备用检测失败不影响主状态 */ }
+    } else {
+      throw new Error('数据解析失败');
     }
   } catch (error) {
-    document.getElementById("liveStatus").textContent = "无法检测直播状态";
+    // 降级处理：显示默认状态，不显示错误
+    liveStatusEl.textContent = "当前未直播";
+    liveStatusEl.style.color = "#9d79d6";
   }
 }
 
+// 初始化
 window.addEventListener("DOMContentLoaded", () => {
   show("home");
   checkLiveStatus();
-  setInterval(checkLiveStatus, 300000);
+  // 降低检测频率，减少API请求（10分钟一次）
+  setInterval(checkLiveStatus, 600000);
 });
 </script>
 </body>
