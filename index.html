@@ -40,6 +40,31 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 .song-table tr:hover{background:rgba(212,209,240,0.1)}
 .no-result{text-align:center;padding:2rem;color:#433469;display:none}
 
+/* 舰礼留档容器样式 */
+.gift-record-container{background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);display:none}
+/* 折叠项样式 */
+.gift-item{border:1px solid #d4d1f0;border-radius:16px;margin-bottom:1rem;overflow:hidden;transition:all 0.3s ease}
+/* 折叠头部（收起状态） */
+.gift-item-header{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 1.5rem;background:rgba(212,209,240,0.2);cursor:pointer}
+.gift-item-title{font-weight:bold;color:#433469;font-size:1rem}
+.gift-item-toggle{font-size:0.9rem;color:#433469;background:rgba(212,209,240,0.5);padding:0.4rem 0.8rem;border-radius:8px;transition:0.2s}
+.gift-item-toggle:hover{background:#433469;color:#fff}
+/* 折叠内容（展开状态） */
+.gift-item-content{padding:1.5rem;background:rgba(255,255,255,0.9);display:none}
+.gift-item-desc{line-height:1.8;margin-bottom:1.5rem;color:#433469}
+.gift-item-btns{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.gift-btn{padding:0.7rem 1.2rem;border-radius:8px;border:none;background:#d4d1f0;color:#433469;font-weight:bold;cursor:pointer;transition:0.2s}
+.gift-btn:hover{background:#433469;color:#fff}
+/* 新增：活动长图展示容器样式 */
+.gift-img-container{width:100%;overflow:auto;margin-top:1rem;border-radius:8px;border:1px solid #d4d1f0;display:none}
+.gift-img{width:100%;height:auto;display:block}
+/* 二维码弹窗样式 */
+.qrcode-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:0.3s}
+.qrcode-modal.show{opacity:1;pointer-events:all}
+.qrcode-content{background:#fff;padding:2rem;border-radius:16px;max-width:90%;text-align:center}
+.qrcode-img{max-width:300px;height:auto;border-radius:8px;margin-bottom:1rem}
+.close-qrcode{padding:0.7rem 1.5rem;background:#433469;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:1rem}
+
 .footer{margin-top:2rem;font-size:0.8rem;color:#433469;text-align:center;padding-bottom:2rem}
 .hidden{display:none!important}
 .show{display:block!important}
@@ -53,7 +78,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 <div class="sidebar-btn" id="navPlaylist">歌单</div>
 <!-- 侧边栏提问箱改为跳转链接（指向指定的dreamail地址） -->
 <a href="https://dreamail.cn/send?dm=b1c26b71-7cf6-4890-aeef-ce2d6d9d4dc0" class="sidebar-btn" target="_blank">提问箱</a>
-<div class="sidebar-btn">舰礼留档</div>
+<div class="sidebar-btn" id="navGiftRecord">舰礼留档</div>
 <div class="sidebar-btn">资源下载</div>
 <div class="sidebar-btn">关于Reii</div>
 <a href="https://live.bilibili.com/1748139065" class="sidebar-btn" target="_blank">Reii的直播间</a>
@@ -122,6 +147,67 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background-image:url
 </table>
 </div>
 
+<!-- 舰礼留档容器 -->
+<div class="gift-record-container" id="giftRecordContent">
+  <h2 style="text-align:center;margin-bottom:2rem;color:#433469;font-size:1.5rem">📜 舰礼留档</h2>
+  
+  <!-- 第一条：202604 出道月活动 -->
+  <div class="gift-item">
+    <div class="gift-item-header" onclick="toggleGiftItem('gift1')">
+      <div class="gift-item-title">202604 出道月活动</div>
+      <div class="gift-item-toggle" id="gift1Toggle">展开</div>
+    </div>
+    <div class="gift-item-content" id="gift1Content">
+      <!-- 简化描述：只保留核心标题，详细内容靠图片体现 -->
+      <div class="gift-item-desc">
+        <strong>活动时间：</strong>2026年4月10日 - 2026年5月10日<br>
+        <strong>活动主题：</strong>月岛怜出道纪念
+      </div>
+      <div class="gift-item-btns">
+        <!-- 修改：点击按钮展示/隐藏长图，不再跳转外链 -->
+        <button class="gift-btn" onclick="toggleGiftImg('gift1Img')">活动详细页</button>
+        <button class="gift-btn" onclick="showQrcode('qrcode1')">填写</button>
+      </div>
+      <!-- 新增：出道月活动长图展示容器 -->
+      <div class="gift-img-container" id="gift1Img">
+        <img src="https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/2604changtu.png" class="gift-img" alt="出道月活动详情">
+      </div>
+    </div>
+  </div>
+
+  <!-- 第二条：202605 满月活动 -->
+  <div class="gift-item">
+    <div class="gift-item-header" onclick="toggleGiftItem('gift2')">
+      <div class="gift-item-title">202605 满月活动</div>
+      <div class="gift-item-toggle" id="gift2Toggle">展开</div>
+    </div>
+    <div class="gift-item-content" id="gift2Content">
+      <!-- 简化描述：只保留核心标题 -->
+      <div class="gift-item-desc">
+        <strong>活动时间：</strong>2026年5月11日 - 2026年6月11日<br>
+        <strong>活动主题：</strong>月岛怜出道满月纪念
+      </div>
+      <div class="gift-item-btns">
+        <button class="gift-btn" onclick="toggleGiftImg('gift2Img')">活动详细页</button>
+        <button class="gift-btn" onclick="showQrcode('qrcode2')">填写</button>
+      </div>
+      <!-- 满月活动长图容器（后续替换为你的图片地址即可） -->
+      <div class="gift-img-container" id="gift2Img">
+        <img src="https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/weikaishi.jpg" class="gift-img" alt="满月活动详情">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 二维码弹窗 -->
+<div class="qrcode-modal" id="qrcodeModal">
+  <div class="qrcode-content">
+    <img src="" class="qrcode-img" id="qrcodeImg">
+    <p style="color:#433469;margin-bottom:1rem">扫码填写舰礼登记信息</p>
+    <button class="close-qrcode" onclick="hideQrcode()">关闭</button>
+  </div>
+</div>
+
 </div>
 
 <div class="footer">© 2026 月岛怜Reii | reii.live</div>
@@ -142,17 +228,23 @@ document.getElementById("overlay").addEventListener("click", () => {
   overlay.classList.remove("show");
 });
 
-// 页面切换（仅保留首页/歌单）
+// 页面切换（新增舰礼留档切换）
 function show(page) {
+  // 隐藏所有内容容器
   document.getElementById("homeContent").classList.add("hidden");
   document.getElementById("playlistContent").classList.remove("show");
+  document.getElementById("giftRecordContent").classList.remove("show");
   
+  // 显示对应页面
   if (page === "home") {
     document.getElementById("homeContent").classList.remove("hidden");
   } else if (page === "music") {
     document.getElementById("playlistContent").classList.add("show");
+  } else if (page === "gift") {
+    document.getElementById("giftRecordContent").classList.add("show");
   }
   
+  // 关闭侧边栏和遮罩
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("overlay").classList.remove("show");
 }
@@ -160,6 +252,7 @@ function show(page) {
 // 绑定导航点击事件
 document.getElementById("navHome").addEventListener("click", () => show("home"));
 document.getElementById("navPlaylist").addEventListener("click", () => show("music"));
+document.getElementById("navGiftRecord").addEventListener("click", () => show("gift"));
 
 // 歌单搜索
 document.getElementById("songSearch").addEventListener("input", () => {
@@ -220,6 +313,60 @@ async function checkLiveStatus() {
     liveStatusEl.textContent = "当前未直播";
     liveStatusEl.style.color = "#9d79d6";
   }
+}
+
+// 舰礼留档 - 折叠/展开功能
+function toggleGiftItem(id) {
+  const content = document.getElementById(`${id}Content`);
+  const toggleBtn = document.getElementById(`${id}Toggle`);
+  
+  if (content.style.display === "block") {
+    // 收起（同时隐藏长图）
+    content.style.display = "none";
+    toggleBtn.textContent = "展开";
+    // 隐藏对应的长图
+    const imgContainer = document.getElementById(`${id}Img`);
+    if (imgContainer) imgContainer.style.display = "none";
+  } else {
+    // 展开
+    content.style.display = "block";
+    toggleBtn.textContent = "收起";
+  }
+}
+
+// 新增：展示/隐藏活动长图
+function toggleGiftImg(id) {
+  const imgContainer = document.getElementById(id);
+  if (imgContainer.style.display === "block") {
+    imgContainer.style.display = "none";
+  } else {
+    imgContainer.style.display = "block";
+    // 滚动到图片位置（优化体验）
+    imgContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// 舰礼留档 - 显示二维码弹窗
+function showQrcode(type) {
+  const modal = document.getElementById("qrcodeModal");
+  const qrcodeImg = document.getElementById("qrcodeImg");
+  
+  if (type === "qrcode1") {
+    // 出道月活动二维码链接
+    qrcodeImg.src = "https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/2604m.png";
+  } else if (type === "qrcode2") {
+    // 满月活动二维码（后续替换为你的地址）
+    qrcodeImg.src = "https://cdn.jsdelivr.net/gh/reiilive/reiilive.github.io@main/weikaishi.jpg";
+  }
+  
+  modal.classList.add("show");
+}
+
+// 舰礼留档 - 隐藏二维码弹窗
+function hideQrcode() {
+  const modal = document.getElementById("qrcodeModal");
+  modal.classList.remove("show");
+  document.getElementById("qrcodeImg").src = ""; // 清空图片
 }
 
 // 初始化
